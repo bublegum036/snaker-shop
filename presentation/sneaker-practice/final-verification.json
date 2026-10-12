@@ -1,7 +1,7 @@
 {
   "environment": {
     "os": "Darwin",
-    "python": "3.13.3",
+    "python": "3.13.15",
     "source": "temporary copy without existing .env or .venv",
     "database": "new empty PostgreSQL database on existing lesson server",
     "swagger": "HTTP /docs and OpenAPI checked; manual UI run is separate"
@@ -10,47 +10,47 @@
     {
       "stage": "new venv",
       "passed": true,
-      "seconds": 1.47
+      "seconds": 0.99
     },
     {
       "stage": "install pinned requirements",
       "passed": true,
-      "seconds": 10.09
+      "seconds": 20.34
     },
     {
       "stage": "pip check",
       "passed": true,
-      "seconds": 0.2
+      "seconds": 0.12
     },
     {
       "stage": "generate local JWT key",
       "passed": true,
-      "seconds": 0.04
+      "seconds": 0.03
     },
     {
       "stage": "migrate empty database",
       "passed": true,
-      "seconds": 5.17
+      "seconds": 2.5
     },
     {
       "stage": "seed catalog",
       "passed": true,
-      "seconds": 0.29
+      "seconds": 0.19
     },
     {
       "stage": "final API acceptance",
       "passed": true,
-      "seconds": 4.88
+      "seconds": 3.72
     },
     {
       "stage": "M2-M3 regression",
       "passed": true,
-      "seconds": 4.9
+      "seconds": 3.87
     },
     {
       "stage": "M4-M5 regression",
       "passed": true,
-      "seconds": 7.98
+      "seconds": 6.74
     }
   ],
   "checks": [
