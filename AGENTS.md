@@ -19,6 +19,9 @@ The user is an Angular frontend developer learning backend development.
 Communicate in Russian and give a brief explanation at each stage: what it
 does and why it is needed here. Use Angular/TypeScript analogies when useful,
 and explain unfamiliar backend terms before relying on them.
+Append new learning questions, answers, and corrections to the local ignored
+`BACKEND-LEARNING-NOTES.md` as the conversation progresses. Keep this file
+untracked; do not stage or publish it.
 
 - `presentation/sneaker-practice/`: runnable FastAPI backend, milestone guides, migrations, seed, and verification scripts.
 - `presentation/sneaker-backend.html` and adjacent JavaScript/CSS: offline interactive course presentation.
