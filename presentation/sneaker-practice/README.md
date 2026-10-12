@@ -177,6 +177,17 @@ python verify_m45.py
 
 ## Остановка и материалы
 
+## Проверка этой локальной копии — 12 октября 2026
+
+Окружение подготовлено в `presentation/sneaker-practice/.venv` на Python 3.13.15.
+Установлен полный `requirements.txt`; `python -m pip check` завершился с
+`No broken requirements found.`. Создан локальный `.env` из `.env.example`,
+ключ JWT сгенерирован через `setup_jwt.py`. `docker compose config --quiet`
+прошёл. Docker Engine 29.8.1, Compose v5.5.1.
+Локальные настройки и виртуальное окружение исключены из Git.
+
+## Остановка и материалы
+
 После Ctrl+C:
 
 ```sh
