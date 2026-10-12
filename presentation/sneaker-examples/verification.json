@@ -1,0 +1,30 @@
+{
+  "python": "3.13.3",
+  "versions": {
+    "fastapi": "0.141.1",
+    "pydantic": "2.13.5",
+    "uvicorn": "0.52.4",
+    "httpx": "0.28.1"
+  },
+  "python_examples": [
+    "23",
+    "24",
+    "25",
+    "26",
+    "28",
+    "29",
+    "30"
+  ],
+  "checks": [
+    "real Python output",
+    "health / 404 / 405",
+    "docs / OpenAPI",
+    "validation / handler not called",
+    "strict quantity",
+    "response filtering",
+    "product validation / decimal JSON",
+    "Depends query validation",
+    "router prefix / catalog"
+  ],
+  "passed": true
+}

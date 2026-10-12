@@ -1,0 +1,3 @@
+# PostgreSQL mechanism demo; tested with Python 3.13.3.
+psycopg[binary]==3.3.6
+psycopg-binary==3.3.6

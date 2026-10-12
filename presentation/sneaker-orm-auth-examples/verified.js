@@ -1,0 +1,221 @@
+window.SNEAKER_ORM_AUTH = {
+  "versions": {
+    "sqlalchemy": "2.0.52",
+    "alembic": "1.20.0",
+    "psycopg": "3.3.6",
+    "fastapi": "0.141.1",
+    "pydantic": "2.13.5",
+    "passlib": "1.7.4",
+    "bcrypt": "4.0.1",
+    "python-jose": "3.5.0"
+  },
+  "orm": {
+    "found": {
+      "id": 10,
+      "name": "North Runner",
+      "price": "7990.00"
+    },
+    "missing": null,
+    "relationship": {
+      "brand_id": 1,
+      "brand_name": "North"
+    },
+    "autobegin_requires_boundary": true,
+    "write_states": [
+      {
+        "step": "new",
+        "id": null,
+        "visible_elsewhere": false
+      },
+      {
+        "step": "add",
+        "id": null,
+        "visible_elsewhere": false
+      },
+      {
+        "step": "flush",
+        "id": 32,
+        "visible_elsewhere": false
+      },
+      {
+        "step": "commit",
+        "id": 32,
+        "visible_elsewhere": true
+      }
+    ],
+    "rollback": {
+      "flushed_row_exists": false,
+      "session_reusable_after_rollback": true
+    }
+  },
+  "migrations": {
+    "before": {
+      "revision": "0001",
+      "image_url": false
+    },
+    "mismatch_sqlstate": "42703",
+    "after": {
+      "revision": "0002",
+      "image_url": true
+    },
+    "seed_counts": {
+      "brands": 2,
+      "users": 3,
+      "orders": 1,
+      "products": 3,
+      "product_sizes": 4,
+      "cart_items": 3,
+      "order_items": 2
+    }
+  },
+  "auth": {
+    "hash": {
+      "hashes_differ": true,
+      "correct_password": true,
+      "wrong_password": false
+    },
+    "register": {
+      "status": 201,
+      "body": {
+        "id": 11,
+        "email": "new@example.com"
+      }
+    },
+    "claims": {
+      "sub": "7",
+      "exp": 1791052678,
+      "iss": "sneaker-lesson",
+      "aud": "sneaker-api"
+    },
+    "none": {
+      "path": "/auth/me",
+      "status": 401,
+      "body": {
+        "detail": "Invalid credentials"
+      }
+    },
+    "expired": {
+      "path": "/auth/me",
+      "status": 401,
+      "body": {
+        "detail": "Invalid credentials"
+      }
+    },
+    "signature": {
+      "path": "/auth/me",
+      "status": 401,
+      "body": {
+        "detail": "Invalid credentials"
+      }
+    },
+    "missing_user": {
+      "path": "/auth/me",
+      "status": 401,
+      "body": {
+        "detail": "Invalid credentials"
+      }
+    },
+    "no_exp": {
+      "path": "/auth/me",
+      "status": 401,
+      "body": {
+        "detail": "Invalid credentials"
+      }
+    },
+    "algorithm": {
+      "path": "/auth/me",
+      "status": 401,
+      "body": {
+        "detail": "Invalid credentials"
+      }
+    },
+    "valid": {
+      "path": "/auth/me",
+      "status": 200,
+      "body": {
+        "id": 7,
+        "email": "anya@example.com"
+      }
+    },
+    "not_admin": {
+      "path": "/admin/check",
+      "status": 403,
+      "body": {
+        "detail": "Admin access required"
+      }
+    },
+    "admin": {
+      "path": "/admin/check",
+      "status": 200,
+      "body": {
+        "allowed": true,
+        "user_id": 9
+      }
+    },
+    "own_order": {
+      "path": "/orders/501",
+      "status": 200,
+      "body": {
+        "id": 501,
+        "user_id": 7,
+        "status": "completed",
+        "total": "21970.00"
+      }
+    },
+    "other_order": {
+      "path": "/orders/501",
+      "status": 404,
+      "body": {
+        "detail": "Order not found"
+      }
+    },
+    "absent_order": {
+      "path": "/orders/999",
+      "status": 404,
+      "body": {
+        "detail": "Order not found"
+      }
+    }
+  },
+  "checks": [
+    "first migration: seven tables without image_url",
+    "new model against old table rejected",
+    "second migration adds image_url",
+    "downgrade removes image_url",
+    "head matches ORM metadata",
+    "repeat seed preserves row counts and existing password",
+    "select and relationship",
+    "Decimal JSON serialization",
+    "SELECT starts transaction via autobegin",
+    "flush gives ID without visibility in another connection",
+    "commit visible to a new transaction",
+    "exception rolls back flushed data",
+    "session reusable after explicit rollback of failed flush",
+    "bcrypt salts and password verification",
+    "registration excludes hash and role",
+    "duplicate email conflict",
+    "client cannot register as admin",
+    "bcrypt UTF-8 byte limit enforced",
+    "unknown user and wrong password have same response",
+    "login user 7",
+    "login user 8",
+    "login user 9",
+    "access case: none",
+    "access case: expired",
+    "access case: signature",
+    "access case: missing_user",
+    "access case: no_exp",
+    "access case: algorithm",
+    "access case: valid",
+    "access case: not_admin",
+    "access case: admin",
+    "access case: own_order",
+    "access case: other_order",
+    "access case: absent_order",
+    "foreign order hidden like absent order",
+    "responses contain no password hash",
+    "role claim does not override DB role",
+    "old token does not retain revoked admin permission"
+  ],
+  "checked_at": "2026-10-03T18:22:58.653382+00:00"
+};

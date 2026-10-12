@@ -1,0 +1,238 @@
+window.SNEAKER_M23 = {
+  "filters": [
+    {
+      "key": "all",
+      "request": "/products",
+      "status": 200,
+      "ids": [
+        10,
+        20,
+        30
+      ]
+    },
+    {
+      "key": "brand",
+      "request": "/products?brand_id=1",
+      "status": 200,
+      "ids": [
+        10,
+        30
+      ]
+    },
+    {
+      "key": "price",
+      "request": "/products?min_price=6000&max_price=8000",
+      "status": 200,
+      "ids": [
+        10
+      ]
+    },
+    {
+      "key": "size",
+      "request": "/products?size=42",
+      "status": 200,
+      "ids": [
+        10,
+        30
+      ]
+    },
+    {
+      "key": "sold_out",
+      "request": "/products?size=43",
+      "status": 200,
+      "ids": []
+    },
+    {
+      "key": "search",
+      "request": "/products?search=nOrTh",
+      "status": 200,
+      "ids": [
+        10,
+        30
+      ]
+    },
+    {
+      "key": "combined",
+      "request": "/products?brand_id=1&size=42&max_price=8000",
+      "status": 200,
+      "ids": [
+        10
+      ]
+    },
+    {
+      "key": "empty",
+      "request": "/products?brand_id=999",
+      "status": 200,
+      "ids": []
+    },
+    {
+      "key": "literal",
+      "request": "/products?search=%25",
+      "status": 200,
+      "ids": []
+    },
+    {
+      "key": "page1",
+      "request": "/products?limit=1&offset=0",
+      "status": 200,
+      "ids": [
+        10
+      ]
+    },
+    {
+      "key": "page2",
+      "request": "/products?limit=1&offset=1",
+      "status": 200,
+      "ids": [
+        20
+      ]
+    },
+    {
+      "key": "beyond",
+      "request": "/products?limit=1&offset=99",
+      "status": 200,
+      "ids": []
+    }
+  ],
+  "matrix": [
+    {
+      "identity": "none",
+      "statuses": [
+        401,
+        401,
+        401
+      ],
+      "unchanged": true
+    },
+    {
+      "identity": "invalid",
+      "statuses": [
+        401,
+        401,
+        401
+      ],
+      "unchanged": true
+    },
+    {
+      "identity": "user",
+      "statuses": [
+        403,
+        403,
+        403
+      ],
+      "unchanged": true
+    },
+    {
+      "identity": "admin",
+      "statuses": [
+        201,
+        200,
+        204
+      ],
+      "changed": true
+    }
+  ],
+  "auth": {
+    "register": 201,
+    "login": 200,
+    "me": 200,
+    "invalid": 401,
+    "ordinary_write": 403,
+    "hash_verified": true,
+    "hash_hidden": true,
+    "role_from_database": true
+  },
+  "deletion": {
+    "status": 409,
+    "product_id": 10,
+    "history_preserved": true
+  },
+  "checks": [
+    "M2 public catalog available",
+    "M2 POST route unavailable",
+    "M2 PUT route unavailable",
+    "M2 DELETE route unavailable",
+    "M2 writes absent in OpenAPI",
+    "M2 forbidden writes preserve data",
+    "M3 Swagger HTML available",
+    "OpenAPI defines HTTP Bearer for writes",
+    "public brands available",
+    "card contains Decimal price and both sizes",
+    "catalog all",
+    "catalog brand",
+    "catalog price",
+    "catalog size",
+    "catalog sold_out",
+    "catalog search",
+    "catalog combined",
+    "catalog empty",
+    "catalog literal",
+    "catalog page1",
+    "catalog page2",
+    "catalog beyond",
+    "invalid query limit=0",
+    "invalid query limit=101",
+    "invalid query offset=-1",
+    "invalid query min_price=9000&max_price=1000",
+    "invalid query size=-1",
+    "invalid query min_price=NaN",
+    "unknown product returns 404",
+    "register ordinary user",
+    "register response omits password and hash",
+    "duplicate normalized email returns 409",
+    "public privilege injection rejected",
+    "invalid credentials bad",
+    "invalid credentials short@example.com",
+    "invalid credentials long@example.com",
+    "password stored as verified bcrypt hash",
+    "failed registration created no extra account",
+    "wrong password does not verify",
+    "same password gets different salted hashes",
+    "JSON login issues bearer token",
+    "JWT contains subject expiry issuer audience without role/password",
+    "unknown user and wrong password have same 401",
+    "me returns verified account without hash",
+    "me rejects missing",
+    "me rejects malformed",
+    "me rejects expired",
+    "me rejects signature",
+    "me rejects absent_user",
+    "me rejects audience",
+    "me rejects no_exp",
+    "me rejects wrong_algorithm",
+    "me rejects invalid_subject",
+    "local promotion reflected with same existing token",
+    "none denied POST",
+    "none denied PUT",
+    "none denied DELETE",
+    "none denial preserves all catalog/cart/order rows",
+    "invalid denied POST",
+    "invalid denied PUT",
+    "invalid denied DELETE",
+    "invalid denial preserves all catalog/cart/order rows",
+    "user denied POST",
+    "user denied PUT",
+    "user denied DELETE",
+    "user denial preserves all catalog/cart/order rows",
+    "reject product price",
+    "reject product price",
+    "reject product name",
+    "reject product brand_id",
+    "reject product is_admin",
+    "reject product image_url",
+    "invalid product inputs preserve database",
+    "unknown brand returns 409 without insertion",
+    "admin creates product with 201",
+    "admin replaces card with 200",
+    "admin deletes with empty 204",
+    "unknown product PUT returns 404",
+    "unknown product DELETE returns 404",
+    "deleting historical product returns 409 and preserves whole state",
+    "catalog edit preserves historical price",
+    "cart-only reference blocks deletion without changes",
+    "unreferenced product and sizes delete together",
+    "deleted product sizes absent",
+    "revoked role takes effect with same JWT"
+  ],
+  "database": "new disposable database; real HTTP on loopback"
+};

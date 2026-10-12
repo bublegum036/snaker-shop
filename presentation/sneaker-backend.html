@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Бэкенд магазина кроссовок — главы 1–18</title>
+  <link rel="stylesheet" href="sneaker-backend.css">
+  <script src="vendor/rough.js" defer></script>
+  <script src="sneaker-backend-content.js" defer></script>
+  <script src="sneaker-examples/verified.js" defer></script>
+  <script src="sneaker-backend-chapters-3-4.js" defer></script>
+  <script src="sneaker-db-examples/verified.js" defer></script>
+  <script src="sneaker-backend-chapters-5-6.js" defer></script>
+  <script src="sneaker-orm-auth-examples/verified.js" defer></script>
+  <script src="sneaker-backend-chapters-7-8.js" defer></script>
+  <script src="sneaker-checkout-examples/verified.js" defer></script>
+  <script src="sneaker-checkout-examples/prompts.js" defer></script>
+  <script src="sneaker-backend-chapters-9-10.js" defer></script>
+  <script src="sneaker-practice/verified.js" defer></script>
+  <script src="sneaker-practice/http-verified.js" defer></script>
+  <script src="sneaker-practice/prompts.js" defer></script>
+  <script src="sneaker-backend-chapters-11-12.js" defer></script>
+  <script src="sneaker-practice/m23-verified.js" defer></script>
+  <script src="sneaker-practice/m23-prompts.js" defer></script>
+  <script src="sneaker-backend-chapters-13-14.js" defer></script>
+  <script src="sneaker-practice/m45-verified.js" defer></script>
+  <script src="sneaker-practice/m45-prompts.js" defer></script>
+  <script src="sneaker-backend-chapters-15-16.js" defer></script>
+  <script src="sneaker-practice/final-verified.js" defer></script>
+  <script src="sneaker-practice/final-prompts.js" defer></script>
+  <script src="sneaker-backend-chapters-17-18.js" defer></script>
+  <script src="sneaker-backend.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#deck">К слайдам</a>
+  <header class="topbar">
+    <a href="#s-001" class="brand"><span class="brand-icon" aria-hidden="true">✳</span><span>Бэкенд магазина</span></a>
+    <div class="header-actions">
+      <button id="contents">Содержание</button>
+      <button id="fullscreen">На весь экран</button>
+      <button id="print">PDF</button>
+    </div>
+  </header>
+  <main id="deck" tabindex="-1" aria-label="Презентация по бэкенду магазина кроссовок"></main>
+  <footer class="navigation">
+    <button id="notes" class="secondary">Пояснение <span aria-hidden="true">↗</span></button>
+    <button id="steps" class="secondary" aria-pressed="false">По шагам</button>
+    <span id="step-count" aria-live="polite"></span>
+    <span id="slide-number" aria-live="polite"></span>
+    <div class="page-buttons">
+      <button id="previous" aria-label="Предыдущий слайд или шаг">←</button>
+      <button id="next">Дальше <span aria-hidden="true">→</span></button>
+    </div>
+  </footer>
+  <div class="progress" aria-hidden="true"><div id="progress-fill"></div></div>
+  <dialog id="toc-dialog" aria-labelledby="toc-title">
+    <header class="dialog-header"><h2 id="toc-title">Первые четырнадцать глав</h2><button data-close aria-label="Закрыть содержание">×</button></header>
+    <p class="dialog-intro">192 слайда · можно начать с любой темы</p>
+    <nav id="toc-list" aria-label="Выбрать слайд"></nav>
+    <p class="help">← → — листать · N — пояснение · S — по шагам · F — полный экран · Home / End — начало / конец</p>
+  </dialog>
+  <dialog id="notes-dialog" aria-labelledby="notes-title">
+    <header class="dialog-header"><h2 id="notes-title">Пояснение</h2><button data-close aria-label="Закрыть пояснение">×</button></header>
+    <div id="notes-content"></div>
+  </dialog>
+  <dialog id="prompt-dialog" aria-labelledby="prompt-title">
+    <header class="dialog-header"><h2 id="prompt-title">Полный промпт</h2><button data-close aria-label="Закрыть промпт">×</button></header>
+    <label class="tx-prompt-label" for="prompt-text">Текст для копирования</label>
+    <textarea id="prompt-text" readonly spellcheck="false"></textarea>
+    <div class="tx-prompt-footer"><button id="copy-prompt">Скопировать</button><p id="prompt-status" role="status"></p></div>
+  </dialog>
+  <noscript>Для показа включите JavaScript. <a href="sneaker-backend-chapters-1-18.pdf">Открыть PDF всех восемнадцати глав.</a></noscript>
+</body>
+</html>

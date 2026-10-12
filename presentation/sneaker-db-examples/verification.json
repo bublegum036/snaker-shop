@@ -1,0 +1,244 @@
+{
+  "engine": "PostgreSQL 17.11 (Debian 17.11-1.pgdg13+2) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "queries": {
+    "cheap": {
+      "sql": "SELECT id, name, price\nFROM products\nWHERE price <= 8000\nORDER BY price, id\nLIMIT 10;",
+      "rows": [
+        {
+          "id": 20,
+          "name": "City Walk",
+          "price": 5990.0
+        },
+        {
+          "id": 10,
+          "name": "North Runner",
+          "price": 7990.0
+        }
+      ]
+    },
+    "north": {
+      "sql": "SELECT id, name, price\nFROM products\nWHERE brand_id = 1\nORDER BY price, id\nLIMIT 10;",
+      "rows": [
+        {
+          "id": 10,
+          "name": "North Runner",
+          "price": 7990.0
+        },
+        {
+          "id": 30,
+          "name": "North Trail",
+          "price": 9990.0
+        }
+      ]
+    },
+    "first": {
+      "sql": "SELECT id, name, price\nFROM products\nORDER BY price, id\nLIMIT 1;",
+      "rows": [
+        {
+          "id": 20,
+          "name": "City Walk",
+          "price": 5990.0
+        }
+      ]
+    },
+    "join": {
+      "sql": "SELECT p.id, p.name, b.name AS brand\nFROM products AS p\nJOIN brands AS b ON b.id = p.brand_id\nORDER BY p.id;",
+      "rows": [
+        {
+          "id": 10,
+          "name": "North Runner",
+          "brand": "North"
+        },
+        {
+          "id": 20,
+          "name": "City Walk",
+          "brand": "City"
+        },
+        {
+          "id": 30,
+          "name": "North Trail",
+          "brand": "North"
+        }
+      ]
+    }
+  },
+  "tables": {
+    "users": [
+      {
+        "id": 7,
+        "email": "anya@example.com",
+        "is_admin": false
+      },
+      {
+        "id": 8,
+        "email": "boris@example.com",
+        "is_admin": false
+      },
+      {
+        "id": 9,
+        "email": "admin@example.com",
+        "is_admin": true
+      }
+    ],
+    "brands": [
+      {
+        "id": 1,
+        "name": "North"
+      },
+      {
+        "id": 2,
+        "name": "City"
+      }
+    ],
+    "products": [
+      {
+        "id": 10,
+        "name": "North Runner",
+        "brand_id": 1,
+        "price": 7990.0
+      },
+      {
+        "id": 20,
+        "name": "City Walk",
+        "brand_id": 2,
+        "price": 5990.0
+      },
+      {
+        "id": 30,
+        "name": "North Trail",
+        "brand_id": 1,
+        "price": 9990.0
+      }
+    ],
+    "product_sizes": [
+      {
+        "id": 101,
+        "product_id": 10,
+        "size": 42.0,
+        "stock": 3
+      },
+      {
+        "id": 102,
+        "product_id": 10,
+        "size": 43.0,
+        "stock": 0
+      },
+      {
+        "id": 201,
+        "product_id": 20,
+        "size": 41.0,
+        "stock": 5
+      },
+      {
+        "id": 301,
+        "product_id": 30,
+        "size": 42.0,
+        "stock": 2
+      }
+    ],
+    "cart_items": [
+      {
+        "id": 55,
+        "user_id": 7,
+        "product_size_id": 101,
+        "quantity": 2
+      },
+      {
+        "id": 56,
+        "user_id": 7,
+        "product_size_id": 201,
+        "quantity": 1
+      },
+      {
+        "id": 57,
+        "user_id": 8,
+        "product_size_id": 102,
+        "quantity": 1
+      }
+    ],
+    "orders": [
+      {
+        "id": 501,
+        "user_id": 7,
+        "status": "completed",
+        "total": 21970.0
+      }
+    ],
+    "order_items": [
+      {
+        "id": 601,
+        "order_id": 501,
+        "product_size_id": 101,
+        "quantity": 2,
+        "price_at_purchase": 7990.0
+      },
+      {
+        "id": 602,
+        "order_id": 501,
+        "product_size_id": 201,
+        "quantity": 1,
+        "price_at_purchase": 5990.0
+      }
+    ]
+  },
+  "checks": [
+    {
+      "constraint": "NOT NULL",
+      "sqlstate": "23502",
+      "rejected": true
+    },
+    {
+      "constraint": "UNIQUE",
+      "sqlstate": "23505",
+      "rejected": true
+    },
+    {
+      "constraint": "FOREIGN KEY",
+      "sqlstate": "23503",
+      "rejected": true
+    },
+    {
+      "constraint": "CHECK",
+      "sqlstate": "23514",
+      "rejected": true
+    },
+    {
+      "constraint": "UNIQUE cart pair",
+      "sqlstate": "23505",
+      "rejected": true
+    },
+    {
+      "constraint": "purchase price snapshot",
+      "unchanged": true
+    }
+  ],
+  "changes": [
+    {
+      "sql": "INSERT INTO brands(id, name)\nVALUES (99, 'Demo');",
+      "rows": [
+        {
+          "id": 99,
+          "name": "Demo"
+        }
+      ]
+    },
+    {
+      "sql": "UPDATE brands\nSET name = 'Demo Updated'\nWHERE id = 99;",
+      "rows": [
+        {
+          "id": 99,
+          "name": "Demo Updated"
+        }
+      ]
+    },
+    {
+      "sql": "DELETE FROM brands\nWHERE id = 99;",
+      "rows": []
+    }
+  ],
+  "trace": {
+    "id": 601,
+    "email": "anya@example.com",
+    "brand": "North"
+  }
+}

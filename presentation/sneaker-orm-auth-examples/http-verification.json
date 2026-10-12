@@ -1,0 +1,9 @@
+{
+  "openapi": 200,
+  "docs": 200,
+  "anonymous": 401,
+  "login": 200,
+  "me": 200,
+  "own_order": 200,
+  "not_admin": 403
+}

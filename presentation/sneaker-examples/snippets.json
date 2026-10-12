@@ -1,0 +1,30 @@
+{
+  "23": {
+    "code": "def line_total(price, quantity):\n    return price * quantity\n\nresult = line_total(7990, 2)\nprint(result)",
+    "expected": "15980\n"
+  },
+  "24": {
+    "code": "cart = [\n    {\"product_size_id\": 101, \"quantity\": 2},\n    {\"product_size_id\": 201, \"quantity\": 1},\n]\nfor item in cart:\n    print(item[\"product_size_id\"], item[\"quantity\"])",
+    "expected": "101 2\n201 1\n"
+  },
+  "25": {
+    "code": "def twice(quantity: int) -> int:\n    return quantity * 2\n\nprint(twice(2))\nprint(twice(\"2\"))",
+    "expected": "4\n22\n"
+  },
+  "26": {
+    "code": "class Product:\n    def __init__(self, name):\n        self.name = name\n\nshoe = Product(\"North Runner\")\nprint(shoe.name)",
+    "expected": "North Runner\n"
+  },
+  "28": {
+    "code": "def check_quantity(quantity):\n    if quantity <= 0:\n        raise ValueError(\"Нужно больше нуля\")\n    return quantity\n\ntry:\n    check_quantity(0)\nexcept ValueError as error:\n    print(error)",
+    "expected": "Нужно больше нуля\n"
+  },
+  "29": {
+    "code": "from decimal import Decimal\n\nprint(0.1 + 0.2)\nprint(Decimal(\"0.1\") + Decimal(\"0.2\"))\ntotal = Decimal(\"7990.00\") * 2\nprint(total)",
+    "expected": "0.30000000000000004\n0.3\n15980.00\n"
+  },
+  "30": {
+    "code": "def can_buy(stock, quantity):\n    if quantity <= 0:\n        return False\n    return quantity <= stock\n\nprint(can_buy(3, 2))\nprint(can_buy(3, 4))\nprint(can_buy(3, 0))",
+    "expected": "True\nFalse\nFalse\n"
+  }
+}

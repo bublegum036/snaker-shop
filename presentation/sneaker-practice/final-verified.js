@@ -1,0 +1,302 @@
+window.SNEAKER_FINAL = {
+  "environment": {
+    "os": "Darwin",
+    "python": "3.13.3",
+    "source": "temporary copy without existing .env or .venv",
+    "database": "new empty PostgreSQL database on existing lesson server",
+    "swagger": "HTTP /docs and OpenAPI checked; manual UI run is separate"
+  },
+  "stages": [
+    {
+      "stage": "new venv",
+      "passed": true,
+      "seconds": 1.47
+    },
+    {
+      "stage": "install pinned requirements",
+      "passed": true,
+      "seconds": 10.09
+    },
+    {
+      "stage": "pip check",
+      "passed": true,
+      "seconds": 0.2
+    },
+    {
+      "stage": "generate local JWT key",
+      "passed": true,
+      "seconds": 0.04
+    },
+    {
+      "stage": "migrate empty database",
+      "passed": true,
+      "seconds": 5.17
+    },
+    {
+      "stage": "seed catalog",
+      "passed": true,
+      "seconds": 0.29
+    },
+    {
+      "stage": "final API acceptance",
+      "passed": true,
+      "seconds": 4.88
+    },
+    {
+      "stage": "M2-M3 regression",
+      "passed": true,
+      "seconds": 4.9
+    },
+    {
+      "stage": "M4-M5 regression",
+      "passed": true,
+      "seconds": 7.98
+    }
+  ],
+  "checks": [
+    "migration created seven application tables",
+    "migration head is 0001",
+    "seed counts are 2/3/4",
+    "second seed leaves all data unchanged",
+    "final health probes database",
+    "docs HTML served",
+    "all 18 operations match API map",
+    "protected checkout advertises Bearer security",
+    "anya register",
+    "anya login",
+    "boris register",
+    "boris login",
+    "admin register",
+    "admin login",
+    "admin promotion works through documented CLI",
+    "current user from JWT",
+    "brands and product list",
+    "product detail price",
+    "admin create product",
+    "admin update product",
+    "admin delete unreferenced product",
+    "add cart item",
+    "set absolute cart quantity",
+    "delete cart item",
+    "add checkout position 101",
+    "add checkout position 201",
+    "two-position cart total",
+    "no_token status and no writes",
+    "not_admin status and no writes",
+    "foreign_cart status and no writes",
+    "quantity_zero status and no writes",
+    "negative_price status and no writes",
+    "empty_email status and no writes",
+    "validation response omits submitted secrets",
+    "short_second_item status and no writes",
+    "checkout created",
+    "checkout total and price snapshots",
+    "checkout cleared own cart",
+    "checkout stock 1 and 4",
+    "own history and detail",
+    "foreign_order status and no writes",
+    "status_forbidden status and no writes",
+    "admin status operation"
+  ],
+  "operation_count": 18,
+  "operations": {
+    "catalog": [
+      {
+        "method": "GET",
+        "path": "/products"
+      },
+      {
+        "method": "GET",
+        "path": "/products/{product_id}"
+      },
+      {
+        "method": "POST",
+        "path": "/products"
+      },
+      {
+        "method": "PUT",
+        "path": "/products/{product_id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/products/{product_id}"
+      },
+      {
+        "method": "GET",
+        "path": "/brands"
+      }
+    ],
+    "auth": [
+      {
+        "method": "POST",
+        "path": "/auth/register"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/login"
+      },
+      {
+        "method": "GET",
+        "path": "/auth/me"
+      }
+    ],
+    "cart": [
+      {
+        "method": "GET",
+        "path": "/cart"
+      },
+      {
+        "method": "POST",
+        "path": "/cart/items"
+      },
+      {
+        "method": "PATCH",
+        "path": "/cart/items/{item_id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/cart/items/{item_id}"
+      }
+    ],
+    "orders": [
+      {
+        "method": "POST",
+        "path": "/orders"
+      },
+      {
+        "method": "GET",
+        "path": "/orders"
+      },
+      {
+        "method": "GET",
+        "path": "/orders/{order_id}"
+      },
+      {
+        "method": "PATCH",
+        "path": "/orders/{order_id}/status"
+      }
+    ],
+    "health": [
+      {
+        "method": "GET",
+        "path": "/health"
+      }
+    ]
+  },
+  "errors": [
+    {
+      "key": "no_token",
+      "status": 401,
+      "unchanged": true,
+      "detail": "Invalid credentials"
+    },
+    {
+      "key": "not_admin",
+      "status": 403,
+      "unchanged": true,
+      "detail": "Admin access required"
+    },
+    {
+      "key": "foreign_cart",
+      "status": 404,
+      "unchanged": true,
+      "detail": "cart_item_not_found"
+    },
+    {
+      "key": "quantity_zero",
+      "status": 422,
+      "unchanged": true,
+      "detail": [
+        {
+          "loc": [
+            "body",
+            "quantity"
+          ],
+          "msg": "Input should be greater than 0",
+          "type": "greater_than"
+        }
+      ]
+    },
+    {
+      "key": "negative_price",
+      "status": 422,
+      "unchanged": true,
+      "detail": [
+        {
+          "loc": [
+            "body",
+            "price"
+          ],
+          "msg": "Input should be greater than 0",
+          "type": "greater_than"
+        }
+      ]
+    },
+    {
+      "key": "empty_email",
+      "status": 422,
+      "unchanged": true,
+      "detail": [
+        {
+          "loc": [
+            "body",
+            "email"
+          ],
+          "msg": "value is not a valid email address: An email address must have an @-sign.",
+          "type": "value_error"
+        }
+      ]
+    },
+    {
+      "key": "short_second_item",
+      "status": 409,
+      "unchanged": true,
+      "detail": "insufficient_stock"
+    },
+    {
+      "key": "foreign_order",
+      "status": 404,
+      "unchanged": true,
+      "detail": "order_not_found"
+    },
+    {
+      "key": "status_forbidden",
+      "status": 403,
+      "unchanged": true,
+      "detail": "Admin access required"
+    }
+  ],
+  "journey": [
+    {
+      "step": "Вход",
+      "status": 200,
+      "result": "Аня подтверждена через /auth/me"
+    },
+    {
+      "step": "Каталог",
+      "status": 200,
+      "result": "101: 7990.00 / stock 3; 201: 5990.00 / stock 5"
+    },
+    {
+      "step": "Корзина",
+      "status": 200,
+      "result": "Две позиции, три пары, сумма 21970.00"
+    },
+    {
+      "step": "Заказ",
+      "status": 201,
+      "result": "21970.00; stock 1 и 4; корзина пуста"
+    },
+    {
+      "step": "История",
+      "status": 200,
+      "result": "Свой заказ виден; чужой ID возвращает 404"
+    }
+  ],
+  "total": "21970.00",
+  "regression": {
+    "m23": 85,
+    "m45": 76
+  },
+  "cleanup": "temporary directory and databases removed; working volume preserved"
+};

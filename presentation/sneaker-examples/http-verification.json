@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "transport": "Uvicorn over HTTP on localhost",
+  "checks": [
+    "health",
+    "catalog",
+    "Swagger HTML",
+    "422 quantity",
+    "200 valid quantity",
+    "response fields"
+  ]
+}
