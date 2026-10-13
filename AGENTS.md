@@ -22,6 +22,10 @@ and explain unfamiliar backend terms before relying on them.
 Append new learning questions, answers, and corrections to the local ignored
 `BACKEND-LEARNING-NOTES.md` as the conversation progresses. Keep this file
 untracked; do not stage or publish it.
+When asking the user to switch accounts in Swagger, include the login JSON
+with the previously suggested fictional study credentials. If the actual
+password is not known, state that the example works only if it was used at
+registration. Do not save passwords or tokens in learning notes or reports.
 
 - `presentation/sneaker-practice/`: runnable FastAPI backend, milestone guides, migrations, seed, and verification scripts.
 - `presentation/sneaker-backend.html` and adjacent JavaScript/CSS: offline interactive course presentation.
