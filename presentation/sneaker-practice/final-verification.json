@@ -10,17 +10,17 @@
     {
       "stage": "new venv",
       "passed": true,
-      "seconds": 0.99
+      "seconds": 1.02
     },
     {
       "stage": "install pinned requirements",
       "passed": true,
-      "seconds": 20.34
+      "seconds": 7.97
     },
     {
       "stage": "pip check",
       "passed": true,
-      "seconds": 0.12
+      "seconds": 0.11
     },
     {
       "stage": "generate local JWT key",
@@ -30,7 +30,7 @@
     {
       "stage": "migrate empty database",
       "passed": true,
-      "seconds": 2.5
+      "seconds": 3.71
     },
     {
       "stage": "seed catalog",
@@ -40,17 +40,17 @@
     {
       "stage": "final API acceptance",
       "passed": true,
-      "seconds": 3.72
+      "seconds": 4.28
     },
     {
       "stage": "M2-M3 regression",
       "passed": true,
-      "seconds": 3.87
+      "seconds": 4.08
     },
     {
       "stage": "M4-M5 regression",
       "passed": true,
-      "seconds": 6.74
+      "seconds": 6.78
     }
   ],
   "checks": [
@@ -60,7 +60,7 @@
     "second seed leaves all data unchanged",
     "final health probes database",
     "docs HTML served",
-    "all 18 operations match API map",
+    "all 21 operations match extended API map",
     "protected checkout advertises Bearer security",
     "anya register",
     "anya login",
@@ -96,9 +96,66 @@
     "own history and detail",
     "foreign_order status and no writes",
     "status_forbidden status and no writes",
-    "admin status operation"
+    "admin status operation",
+    "inventory: all writes advertise Bearer security",
+    "inventory: new product has no sizes",
+    "inventory: create size",
+    "inventory: size visible in public product",
+    "inventory: anonymous cannot POST",
+    "inventory: anonymous cannot PATCH",
+    "inventory: anonymous cannot DELETE",
+    "inventory: ordinary cannot POST",
+    "inventory: ordinary cannot PATCH",
+    "inventory: ordinary cannot DELETE",
+    "inventory: invalid create {'size': '0', 'stock': 1}",
+    "inventory: invalid create {'size': '42.01', 'stock': 1}",
+    "inventory: invalid create {'size': '1000', 'stock': 1}",
+    "inventory: invalid create {'size': 'NaN', 'stock': 1}",
+    "inventory: invalid create {'size': 'Infinity', 'stock': 1}",
+    "inventory: invalid create {'size': '43', 'stock': -1}",
+    "inventory: invalid create {'size': '43', 'stock': 2147483648}",
+    "inventory: invalid create {'size': '43', 'stock': True}",
+    "inventory: invalid create {'size': '43', 'stock': '2'}",
+    "inventory: invalid create {'size': '43', 'stock': 1, 'product_id': 10}",
+    "inventory: invalid patch {}",
+    "inventory: invalid patch {'stock': None}",
+    "inventory: invalid patch {'size': None}",
+    "inventory: invalid patch {'stock': -1}",
+    "inventory: invalid patch {'stock': True}",
+    "inventory: invalid patch {'stock': 1.5}",
+    "inventory: invalid patch {'stock': 2147483648}",
+    "inventory: invalid patch {'size': '42.01'}",
+    "inventory: invalid patch {'size': 'NaN'}",
+    "inventory: invalid patch {'product_id': 10}",
+    "inventory: duplicate numeric size",
+    "inventory: unknown parent",
+    "inventory: unknown size",
+    "inventory: size cannot be patched under another product",
+    "inventory: size cannot be deleted under another product",
+    "inventory: rename unused size preserves stock",
+    "inventory: create sold-out size",
+    "inventory: patch duplicate size rolls back stock too",
+    "inventory: delete unused size has empty 204",
+    "inventory: delete missing size",
+    "inventory: new size can be added to cart",
+    "inventory: cart reference prevents rename",
+    "inventory: cart reference prevents delete",
+    "inventory: stock may fall below cart quantity",
+    "inventory: checkout rechecks changed inventory",
+    "inventory: absolute restock preserves size",
+    "inventory: purchase newly created inventory",
+    "inventory: purchase decrements new size once",
+    "inventory: history prevents rename",
+    "inventory: history prevents deletion",
+    "inventory: unchanged size and restock allowed with history",
+    "inventory: restock preserves order snapshot",
+    "inventory: duplicate create race produces one 201 and one 409",
+    "inventory: duplicate race inserted one row",
+    "inventory: race buyer has one pair in cart",
+    "inventory: stock edit and checkout share observed row locks",
+    "inventory: failed concurrent purchase preserves cart and creates no order"
   ],
-  "operation_count": 18,
+  "operation_count": 21,
   "operations": {
     "catalog": [
       {
@@ -124,6 +181,20 @@
       {
         "method": "GET",
         "path": "/brands"
+      }
+    ],
+    "inventory": [
+      {
+        "method": "POST",
+        "path": "/products/{product_id}/sizes"
+      },
+      {
+        "method": "PATCH",
+        "path": "/products/{product_id}/sizes/{size_id}"
+      },
+      {
+        "method": "DELETE",
+        "path": "/products/{product_id}/sizes/{size_id}"
       }
     ],
     "auth": [

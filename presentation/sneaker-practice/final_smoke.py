@@ -8,10 +8,12 @@ from sqlalchemy import select, text
 from app.database import engine
 from app.models import Base
 from verify_m23 import server
+from inventory_checks import verify_inventory
 
 ROOT=Path(__file__).resolve().parent
 EXPECTED={
  'catalog': [('GET','/products'),('GET','/products/{product_id}'),('POST','/products'),('PUT','/products/{product_id}'),('DELETE','/products/{product_id}'),('GET','/brands')],
+ 'inventory': [('POST','/products/{product_id}/sizes'),('PATCH','/products/{product_id}/sizes/{size_id}'),('DELETE','/products/{product_id}/sizes/{size_id}')],
  'auth': [('POST','/auth/register'),('POST','/auth/login'),('GET','/auth/me')],
  'cart': [('GET','/cart'),('POST','/cart/items'),('PATCH','/cart/items/{item_id}'),('DELETE','/cart/items/{item_id}')],
  'orders': [('POST','/orders'),('GET','/orders'),('GET','/orders/{order_id}'),('PATCH','/orders/{order_id}/status')],
@@ -44,7 +46,7 @@ def verify():
         methods={'get','post','put','patch','delete'}
         actual={(method.upper(),path) for path,ops in spec['paths'].items() for method in ops if method in methods}
         expected={x for values in EXPECTED.values() for x in values}
-        check('all 18 operations match API map',actual==expected)
+        check('all 21 operations match extended API map',actual==expected)
         check('protected checkout advertises Bearer security',bool(spec['paths']['/orders']['post'].get('security')))
         def registration(person):
             credentials={'email':person+'@example.com','password':'Study-only-'+person+'!'}
@@ -99,9 +101,10 @@ def verify():
         rejection('status_forbidden','PATCH',f'/orders/{oid}/status',anya,{'status':'processing'},403)
         r=client.patch(f'/orders/{oid}/status',headers=admin,json={'status':'processing'});check('admin status operation',r.status_code==200 and r.json()['status']=='processing')
         journey.append({'step':'История','status':200,'result':'Свой заказ виден; чужой ID возвращает 404'})
+        checks.extend(verify_inventory(client,admin,anya,boris,engine))
     engine.dispose()
     report={'checks':checks,'operation_count':len(actual),'operations':{k:[{'method':m,'path':p} for m,p in v] for k,v in EXPECTED.items()},'errors':errors,'journey':journey,'total':'21970.00'}
     (ROOT/'final-smoke-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-    print('Final app:',len(checks),'checks passed; 18 operations called over HTTP.')
+    print('Final app:',len(checks),'checks passed;',len(actual),'operations called over HTTP.')
 
 if __name__=='__main__':verify()
