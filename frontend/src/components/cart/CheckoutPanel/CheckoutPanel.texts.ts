@@ -8,4 +8,5 @@ export const checkoutPanelTexts = {
   status: 'Статус',
   created: 'Создан',
   items: 'Позиций в заказе',
+  openOrder: 'Посмотреть заказ →',
 } as const

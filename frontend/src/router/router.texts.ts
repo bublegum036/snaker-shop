@@ -4,6 +4,8 @@ const titles: Readonly<Record<string, string>> = {
   register: 'Регистрация',
   account: 'Ваш профиль',
   cart: 'Корзина',
+  orders: 'Ваши заказы',
+  'order-details': 'Детали заказа',
 }
 
 export const routerTexts = {

@@ -15,6 +15,7 @@ const auth = useAuthStore()
       <span v-if="auth.initializing" class="hint-text" role="status">{{ text.checking }}</span>
       <template v-else-if="auth.isAuthenticated">
         <CartLink />
+        <RouterLink :to="{ name: 'orders' }">{{ text.orders }}</RouterLink>
         <RouterLink class="account-link" :to="{ name: 'account' }">{{ auth.user?.email }}</RouterLink>
         <button type="button" class="text-button" @click="auth.logout()">{{ text.logout }}</button>
       </template>
@@ -57,6 +58,7 @@ nav {
   display: flex;
   align-items: center;
   gap: 20px;
+  flex-wrap: wrap;
   font-size: 13px;
   min-width: 0;
 }

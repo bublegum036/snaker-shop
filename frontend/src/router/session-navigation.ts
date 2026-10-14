@@ -1,3 +1,4 @@
+import { loginReturnQuery } from './auth-redirect'
 import { watch } from 'vue'
 import type { Pinia } from 'pinia'
 import type { Router } from 'vue-router'
@@ -8,7 +9,7 @@ export function watchSessionNavigation(router: Router, pinia: Pinia) {
   const auth = useAuthStore(pinia)
   return watch(() => auth.isAuthenticated, (loggedIn) => {
     if (!loggedIn && router.currentRoute.value.meta.requiresAuth) {
-      void router.replace({ name: 'login' })
+      void router.replace({ name: 'login', query: loginReturnQuery(router.currentRoute.value) })
     }
   })
 }

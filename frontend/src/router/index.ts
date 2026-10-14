@@ -4,6 +4,9 @@ import CatalogView from '@/views/CatalogView/CatalogView.vue'
 import AuthView from '@/views/AuthView/AuthView.vue'
 import AccountView from '@/views/AccountView/AccountView.vue'
 import CartView from '@/views/CartView/CartView.vue'
+import OrdersView from '@/views/OrdersView/OrdersView.vue'
+import OrderDetailsView from '@/views/OrderDetailsView/OrderDetailsView.vue'
+import { loginReturnQuery } from './auth-redirect'
 import { useAuthStore } from '@/stores/auth/auth.store'
 
 const router = createRouter({
@@ -13,6 +16,8 @@ const router = createRouter({
     { path: '/login', name: 'login', component: AuthView, props: { mode: 'login' }, meta: { guestOnly: true } },
     { path: '/register', name: 'register', component: AuthView, props: { mode: 'register' }, meta: { guestOnly: true } },
     { path: '/account', name: 'account', component: AccountView, meta: { requiresAuth: true } },
+    { path: '/orders', name: 'orders', component: OrdersView, meta: { requiresAuth: true } },
+    { path: '/orders/:orderId', name: 'order-details', component: OrderDetailsView, props: (route) => ({ orderId: String(route.params.orderId) }), meta: { requiresAuth: true } },
     { path: '/cart', name: 'cart', component: CartView, meta: { requiresAuth: true } },
   ],
 })
@@ -22,7 +27,7 @@ router.beforeEach(async (to) => {
   const auth = useAuthStore()
   await auth.restoreSession()
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    return { name: 'login', query: { next: to.name === 'cart' ? 'cart' : 'account' } }
+    return { name: 'login', query: loginReturnQuery(to) }
   }
   if (to.meta.guestOnly && auth.isAuthenticated) return { name: 'account' }
 })

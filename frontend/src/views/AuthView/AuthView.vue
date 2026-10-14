@@ -3,6 +3,7 @@ import { authViewTexts as text } from './AuthView.texts'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { register } from '@/api/auth.api'
+import { loginDestination } from '@/router/auth-redirect'
 import { ApiError } from '@/api/http.client'
 import { useAuthStore } from '@/stores/auth/auth.store'
 
@@ -48,10 +49,8 @@ async function submit() {
       await register(credentials, current.signal)
       if (!current.signal.aborted) registered.value = true
     } else if (await auth.login(credentials, current.signal)) {
-      const next = route.query.next
-      // Разрешены только известные страницы приложения, внешние адреса не принимаем.
-      const name = next === 'catalog' || next === 'cart' ? next : 'account'
-      await router.replace({ name })
+      // Разрешены только известные страницы, номер заказа проверяется отдельно.
+      await router.replace(loginDestination(route.query))
     }
   } catch (cause) {
     if (current.signal.aborted) return
