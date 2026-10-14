@@ -30,6 +30,7 @@ password is not known, state that the example works only if it was used at
 registration. Do not save passwords or tokens in learning notes or reports.
 
 - `presentation/sneaker-practice/`: runnable FastAPI backend, milestone guides, migrations, seed, and verification scripts.
+- `frontend/`: Vue 3 / TypeScript / Vite application, Vue Router, Pinia; run instructions and stage notes in its README.
 - `presentation/sneaker-backend.html` and adjacent JavaScript/CSS: offline interactive course presentation.
 - `presentation/sneaker-*-examples/`: earlier instructional examples.
 - `presentation/sneaker-backend-checks/`: presentation browser checks.
@@ -89,6 +90,15 @@ offline operation. Keep JSON prompt/report data and their presentation-facing
 JavaScript copies consistent when editing them.
 
 ## Data and documentation
+
+For frontend stages, run `npm run build` from `frontend/` with a compatible
+Node.js (the working local version is 22.12). For authentication changes,
+also run `npm run check:auth`; these isolated checks do not touch real accounts.
+Keep session tokens and passwords out of source, logs, screenshots, and reports.
+Use `*.api.ts` for domain API modules, `*.store.ts` for Pinia stores, and
+`http.client.ts` for the shared HTTP client. Keep component styles and their
+media queries in `<style scoped>`; global styles are for theme, base rules,
+shared controls and utilities.
 
 Keep local `.env` values, passwords, and JWTs out of source and tool output.
 Preserve existing local configuration. Seed is additive and does not reset

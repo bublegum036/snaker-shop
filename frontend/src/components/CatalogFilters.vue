@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import type { Brand, ProductFilters } from '@/api/catalog'
+import type { Brand, ProductFilters } from '@/api/catalog.api'
 
 defineProps<{
   brands: Brand[]
@@ -67,17 +67,68 @@ function reset() {
           <input v-model="form.maxPrice" type="number" min="0" step="0.01" placeholder="Без ограничений">
         </label>
       </div>
-      <p v-if="validationError" class="filter-error" role="alert">{{ validationError }}</p>
+      <p v-if="validationError" class="error-text" role="alert">{{ validationError }}</p>
       <div class="filter-actions">
         <button type="submit" class="primary-button">Применить</button>
         <button type="button" class="secondary-button" @click="reset">Сбросить</button>
-        <span class="filter-hint">Изменения применяются по кнопке или Enter.</span>
+        <span class="hint-text">Изменения применяются по кнопке или Enter.</span>
       </div>
     </fieldset>
-    <p v-if="brandsLoading" class="filter-hint" role="status">Загружаем бренды…</p>
-    <div v-else-if="brandsError" class="brands-error" role="alert">
+    <p v-if="brandsLoading" class="hint-text" role="status">Загружаем бренды…</p>
+    <div v-else-if="brandsError" class="brands-error error-text" role="alert">
       <span>{{ brandsError }} Остальные фильтры доступны.</span>
       <button type="button" class="text-button" @click="emit('retryBrands')">Повторить загрузку брендов</button>
     </div>
   </form>
 </template>
+
+<style scoped>
+.catalog-filters {
+  margin-bottom: 28px;
+}
+
+.catalog-filters fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.filter-fields {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+.filter-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.filter-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.brands-error {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1000px) {
+  .filter-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .search-field {
+    grid-column: 1 / -1;
+  }
+}
+</style>

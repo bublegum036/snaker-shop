@@ -1,13 +1,28 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import AppHeader from '@/components/layout/AppHeader.vue'
+import AppFooter from '@/components/layout/AppFooter.vue'
+import SessionMessages from '@/components/auth/SessionMessages.vue'
 </script>
 
 <template>
-  <header class="site-header">
-    <RouterLink class="wordmark" to="/" aria-label="North — главная">north<span>®</span></RouterLink>
-    <nav aria-label="Основная навигация"><RouterLink to="/">Каталог</RouterLink></nav>
-    <span class="header-note">Кроссовки на каждый день</span>
-  </header>
-  <main><RouterView /></main>
-  <footer class="site-footer"><span>NORTH / SNEAKER STORE</span><span>Найди свою пару.</span></footer>
+  <AppHeader class="app-container" />
+  <main class="app-container">
+    <SessionMessages />
+    <RouterView />
+  </main>
+  <AppFooter class="app-container" />
 </template>
+
+<style scoped>
+.app-container {
+  width: min(1280px, calc(100% - 96px));
+  margin-inline: auto;
+}
+
+@media (max-width: 600px) {
+  .app-container {
+    width: calc(100% - 36px);
+  }
+}
+</style>

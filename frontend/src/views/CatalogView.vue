@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { getBrands, getProducts, type Brand, type Product, type ProductFilters } from '@/api/catalog'
+import { getBrands, getProducts, type Brand, type Product, type ProductFilters } from '@/api/catalog.api'
 import ProductCard from '@/components/ProductCard.vue'
 import CatalogFilters from '@/components/CatalogFilters.vue'
 
@@ -117,3 +117,121 @@ onBeforeUnmount(() => {
     </nav>
   </section>
 </template>
+
+<style scoped>
+.catalog-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 36px;
+}
+
+.catalog-pagination label, .catalog-pagination > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+nav {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.catalog-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 62px 0 52px;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(56px, 6.6vw, 88px);
+  font-weight: 650;
+  line-height: .98;
+  letter-spacing: -5px;
+}
+
+h1 span {
+  color: #74865a;
+}
+
+.intro-description {
+  margin: 0 0 5px;
+  color: var(--color-muted);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.catalog-toolbar {
+  border-block: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 68px;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+
+h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+h2 span {
+  color: #778171;
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.product-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 38px 24px;
+}
+
+.catalog-message {
+  padding: 70px 20px;
+  text-align: center;
+  background: #eeefe8;
+  line-height: 1.6;
+}
+
+.error-message button {
+  border: 1px solid var(--color-text);
+  padding: 10px 18px;
+  background: transparent;
+}
+
+@media (max-width: 1000px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .catalog-intro {
+    padding: 42px 0 32px;
+  }
+
+  h1 {
+    font-size: 58px;
+    letter-spacing: -3px;
+  }
+
+  .intro-description {
+    display: none;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+</style>
