@@ -10,17 +10,17 @@ window.SNEAKER_FINAL = {
     {
       "stage": "new venv",
       "passed": true,
-      "seconds": 1.02
+      "seconds": 1.01
     },
     {
       "stage": "install pinned requirements",
       "passed": true,
-      "seconds": 7.97
+      "seconds": 6.27
     },
     {
       "stage": "pip check",
       "passed": true,
-      "seconds": 0.11
+      "seconds": 0.12
     },
     {
       "stage": "generate local JWT key",
@@ -28,34 +28,44 @@ window.SNEAKER_FINAL = {
       "seconds": 0.03
     },
     {
-      "stage": "migrate empty database",
+      "stage": "migrate base schema",
       "passed": true,
-      "seconds": 3.71
+      "seconds": 2.8
+    },
+    {
+      "stage": "verify idempotency migration preserves data",
+      "passed": true,
+      "seconds": 0.3
     },
     {
       "stage": "seed catalog",
       "passed": true,
-      "seconds": 0.19
+      "seconds": 0.18
     },
     {
       "stage": "final API acceptance",
       "passed": true,
-      "seconds": 4.28
+      "seconds": 5.96
+    },
+    {
+      "stage": "schema and seed regression",
+      "passed": true,
+      "seconds": 0.39
     },
     {
       "stage": "M2-M3 regression",
       "passed": true,
-      "seconds": 4.08
+      "seconds": 4.03
     },
     {
       "stage": "M4-M5 regression",
       "passed": true,
-      "seconds": 6.78
+      "seconds": 6.74
     }
   ],
   "checks": [
-    "migration created seven application tables",
-    "migration head is 0001",
+    "migration created eight application tables",
+    "migration head is 0002",
     "seed counts are 2/3/4",
     "second seed leaves all data unchanged",
     "final health probes database",
@@ -153,7 +163,41 @@ window.SNEAKER_FINAL = {
     "inventory: duplicate race inserted one row",
     "inventory: race buyer has one pair in cart",
     "inventory: stock edit and checkout share observed row locks",
-    "inventory: failed concurrent purchase preserves cart and creates no order"
+    "inventory: failed concurrent purchase preserves cart and creates no order",
+    "idempotency: Swagger exposes optional header",
+    "idempotency: key does not bypass authentication",
+    "idempotency: invalid header ''",
+    "idempotency: invalid header 'has space'",
+    "idempotency: invalid header 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'",
+    "idempotency: invalid header 'comma,key'",
+    "idempotency: duplicate header is rejected",
+    "idempotency: empty cart does not consume key",
+    "idempotency: empty cart error is explicit",
+    "idempotency: first keyed purchase succeeds",
+    "idempotency: one durable key linked to purchase",
+    "idempotency: keyed purchase deducts stock once",
+    "idempotency: lost response retry with empty JSON",
+    "idempotency: lost response retry with absent body",
+    "idempotency: replay still validates body",
+    "idempotency: same key cannot read another users result",
+    "idempotency: same key allowed for another user",
+    "idempotency: replay preserves original snapshot and newly filled cart",
+    "idempotency: order detail shows actual current status",
+    "idempotency: retry survives server restart",
+    "idempotency: new key buys the new cart at current price",
+    "idempotency: missing key keeps legacy empty-cart response",
+    "idempotency: legacy purchase does not create a request record",
+    "idempotency: rollback including key at after_order",
+    "idempotency: rollback including key at after_first_stock",
+    "idempotency: rollback including key at after_cart_delete",
+    "idempotency: rollback including key at after_idempotency_record",
+    "idempotency: rolled-back key can be retried successfully",
+    "idempotency: stock failure does not consume key",
+    "idempotency: retry after restock uses the previously failed key",
+    "idempotency: concurrent same-key requests return identical 201",
+    "idempotency: concurrent retry creates one order and deducts once",
+    "idempotency: different keys compete for one cart",
+    "idempotency: successful responses remain replayable after races"
   ],
   "operation_count": 21,
   "operations": {
@@ -366,6 +410,7 @@ window.SNEAKER_FINAL = {
   ],
   "total": "21970.00",
   "regression": {
+    "schema": 25,
     "m23": 85,
     "m45": 76
   },

@@ -1,7 +1,7 @@
 from decimal import Decimal
 from sqlalchemy import delete, select
 from sqlalchemy.orm import selectinload
-from app.models import User, CartItem, ProductSize, Product, Order, OrderItem
+from app.models import User, CartItem, ProductSize, Product, Order, OrderItem, CheckoutRequestRecord
 from app.schemas.orders import OrderRead, OrderItemRead
 from app.services.unit_of_work import ShopError, transaction
 
@@ -11,12 +11,21 @@ def dto(order):
         total=order.total, created_at=order.created_at,
         items=[OrderItemRead.model_validate(item) for item in sorted(order.items, key=lambda x:x.id)])
 
-def checkout(user_id, *, sessions=None, _test_hook=None):
+def checkout(user_id, *, idempotency_key=None, sessions=None, _test_hook=None):
     """Hook is an internal Python test seam; no HTTP input can select it."""
     def stage(name, db):
         if _test_hook is not None:
             _test_hook(name, db)
     with transaction(owner_id=user_id, sessions=sessions) as db:
+        # The owner's FOR UPDATE lock serializes both retries and cart changes.
+        # Replay BEFORE reading the cart: a retry must never buy a new cart.
+        if idempotency_key is not None:
+            previous = db.scalar(select(CheckoutRequestRecord).where(
+                CheckoutRequestRecord.user_id == user_id,
+                CheckoutRequestRecord.key == idempotency_key,
+            ))
+            if previous is not None:
+                return OrderRead.model_validate(previous.response)
         cart = list(db.scalars(select(CartItem).where(CartItem.user_id == user_id).order_by(CartItem.product_size_id)))
         if not cart:
             raise ShopError(409, 'empty_cart')
@@ -54,6 +63,13 @@ def checkout(user_id, *, sessions=None, _test_hook=None):
         db.flush()
         stage('after_cart_delete', db)
         result = dto(order)
+        if idempotency_key is not None:
+            db.add(CheckoutRequestRecord(
+                user_id=user_id, key=idempotency_key, order_id=order.id,
+                response=result.model_dump(mode='json'),
+            ))
+            db.flush()
+            stage('after_idempotency_record', db)
     # Commit succeeded and the new session is closed before returning the DTO.
     return result
 

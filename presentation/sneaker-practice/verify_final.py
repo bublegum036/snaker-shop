@@ -50,17 +50,20 @@ def run():
             # The temporary .env is the only source of application configuration.
             value=target.render_as_string(hide_password=False)
             (copy/'.env').write_text('DATABASE_URL='+value+'\nJWT_SECRET=\n')
-            step('generate local JWT key',[python,'setup_jwt.py'])
-            step('migrate empty database',[python,'-m','alembic','upgrade','head'])
-            step('seed catalog',[python,'-m','app.seed'])
             env['SNEAKER_FINAL_DISPOSABLE']='yes'
+            step('generate local JWT key',[python,'setup_jwt.py'])
+            step('migrate base schema',[python,'-m','alembic','upgrade','0001'])
+            step('verify idempotency migration preserves data',[python,'verify_migration.py'])
+            step('seed catalog',[python,'-m','app.seed'])
             step('final API acceptance',[python,'final_smoke.py'])
             smoke=json.loads((copy/'final-smoke-result.json').read_text())
+            step('schema and seed regression',[python,'verify.py'])
+            schema=json.loads((copy/'verification.json').read_text())
             step('M2-M3 regression',[python,'verify_m23.py'])
             m23=json.loads((copy/'m23-verification.json').read_text())
             step('M4-M5 regression',[python,'verify_m45.py'])
             m45=json.loads((copy/'m45-verification.json').read_text())
-            report={'environment':{'os':platform.system(),'python':platform.python_version(),'source':'temporary copy without existing .env or .venv','database':'new empty PostgreSQL database on existing lesson server','swagger':'HTTP /docs and OpenAPI checked; manual UI run is separate'},'stages':stages,**smoke,'regression':{'m23':len(m23['checks']),'m45':len(m45['checks'])},'cleanup':'temporary directory and databases removed; working volume preserved'}
+            report={'environment':{'os':platform.system(),'python':platform.python_version(),'source':'temporary copy without existing .env or .venv','database':'new empty PostgreSQL database on existing lesson server','swagger':'HTTP /docs and OpenAPI checked; manual UI run is separate'},'stages':stages,**smoke,'regression':{'schema':len(schema['checks']),'m23':len(m23['checks']),'m45':len(m45['checks'])},'cleanup':'temporary directory and databases removed; working volume preserved'}
     finally:
         if created:
             with admin.connect() as db:db.execute(text(f'DROP DATABASE "{name}"'))

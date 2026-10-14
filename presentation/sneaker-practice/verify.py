@@ -37,15 +37,15 @@ def verify():
         with engine.begin() as connection:
             config.attributes['connection'] = connection
             command.upgrade(config, 'head')
-        check('migration creates seven tables and alembic_version', set(inspect(engine).get_table_names()) == set(Base.metadata.tables) | {'alembic_version'})
+        check('migration creates eight tables and alembic_version', set(inspect(engine).get_table_names()) == set(Base.metadata.tables) | {'alembic_version'})
         with engine.begin() as connection:
             config.attributes['connection'] = connection
             command.upgrade(config, 'head')
             command.check(config)
-            check('migration reaches 0001 and repeats safely', connection.scalar(text('SELECT version_num FROM alembic_version')) == '0001')
+            check('migration reaches 0002 and repeats safely', connection.scalar(text('SELECT version_num FROM alembic_version')) == '0002')
         checks.append('alembic check finds no pending model changes')
         inspector = inspect(engine)
-        check('seven foreign keys exist', sum(len(inspector.get_foreign_keys(t)) for t in Base.metadata.tables) == 7)
+        check('nine foreign keys exist', sum(len(inspector.get_foreign_keys(t)) for t in Base.metadata.tables) == 9)
         price = next(c for c in inspector.get_columns('products') if c['name'] == 'price')
         check('price is non-null numeric(10,2)', not price['nullable'] and price['type'].precision == 10 and price['type'].scale == 2)
         check('image_url is nullable', next(c for c in inspector.get_columns('products') if c['name'] == 'image_url')['nullable'])
@@ -55,7 +55,7 @@ def verify():
                 return {t: [dict(row) for row in connection.execute(select(Base.metadata.tables[t]).order_by(Base.metadata.tables[t].c.id)).mappings()] for t in Base.metadata.tables}
         first = snapshot()
         report['counts'] = {t: len(rows) for t, rows in first.items()}
-        check('catalog seed counts 2 / 3 / 4 and no accounts or purchases', report['counts'] == {'users': 0, 'brands': 2, 'products': 3, 'product_sizes': 4, 'cart_items': 0, 'orders': 0, 'order_items': 0})
+        check('catalog seed counts 2 / 3 / 4 and no accounts or purchases', report['counts'] == {'users': 0, 'brands': 2, 'products': 3, 'product_sizes': 4, 'cart_items': 0, 'orders': 0, 'order_items': 0, 'checkout_requests': 0})
         seed(engine)
         check('second seed preserves all row values', snapshot() == first)
         with engine.begin() as connection:
@@ -103,7 +103,7 @@ def verify():
             check('seed advances identity beyond fixed IDs', new_id > 30)
             transaction.rollback()
         check('constraint fixtures rolled back', snapshot()['users'] == [] and snapshot()['orders'] == [])
-        report.update(checks=checks, database='new disposable database', revision='0001')
+        report.update(checks=checks, database='new disposable database', revision='0002')
     finally:
         if engine is not None:
             engine.dispose()

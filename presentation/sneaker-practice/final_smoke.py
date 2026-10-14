@@ -9,6 +9,7 @@ from app.database import engine
 from app.models import Base
 from verify_m23 import server
 from inventory_checks import verify_inventory
+from idempotency_checks import verify_idempotency
 
 ROOT=Path(__file__).resolve().parent
 EXPECTED={
@@ -33,8 +34,8 @@ def verify():
         with engine.connect() as db:
             return {t:[tuple(row) for row in db.execute(select(Base.metadata.tables[t]).order_by(Base.metadata.tables[t].c.id))] for t in Base.metadata.tables}
     with engine.connect() as db:
-        check('migration created seven application tables',len(Base.metadata.tables)==7 and all(db.scalar(text('SELECT to_regclass(:name)'),{'name':name}) for name in Base.metadata.tables))
-        check('migration head is 0001',db.scalar(text('SELECT version_num FROM alembic_version'))=='0001')
+        check('migration created eight application tables',len(Base.metadata.tables)==8 and all(db.scalar(text('SELECT to_regclass(:name)'),{'name':name}) for name in Base.metadata.tables))
+        check('migration head is 0002',db.scalar(text('SELECT version_num FROM alembic_version'))=='0002')
         check('seed counts are 2/3/4',tuple(db.execute(text('SELECT (SELECT count(*) FROM brands),(SELECT count(*) FROM products),(SELECT count(*) FROM product_sizes)')).one())==(2,3,4))
     before=snapshot()
     subprocess.run([sys.executable,'-m','app.seed'],cwd=ROOT,check=True,capture_output=True,timeout=20)
@@ -102,6 +103,7 @@ def verify():
         r=client.patch(f'/orders/{oid}/status',headers=admin,json={'status':'processing'});check('admin status operation',r.status_code==200 and r.json()['status']=='processing')
         journey.append({'step':'История','status':200,'result':'Свой заказ виден; чужой ID возвращает 404'})
         checks.extend(verify_inventory(client,admin,anya,boris,engine))
+        checks.extend(verify_idempotency(client,admin,engine))
     engine.dispose()
     report={'checks':checks,'operation_count':len(actual),'operations':{k:[{'method':m,'path':p} for m,p in v] for k,v in EXPECTED.items()},'errors':errors,'journey':journey,'total':'21970.00'}
     (ROOT/'final-smoke-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
