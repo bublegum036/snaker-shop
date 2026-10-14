@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { register } from '@/api/auth.api'
 import { ApiError } from '@/api/http.client'
 import { useAuthStore } from '@/stores/auth.store'
@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth.store'
 const props = defineProps<{ mode: 'login' | 'register' }>()
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const email = ref('')
 const password = ref('')
 const error = ref('')
@@ -46,7 +47,10 @@ async function submit() {
       await register(credentials, current.signal)
       if (!current.signal.aborted) registered.value = true
     } else if (await auth.login(credentials, current.signal)) {
-      await router.replace({ name: 'account' })
+      const next = route.query.next
+      // Разрешены только известные страницы приложения, внешние адреса не принимаем.
+      const name = next === 'catalog' || next === 'cart' ? next : 'account'
+      await router.replace({ name })
     }
   } catch (cause) {
     if (current.signal.aborted) return
@@ -70,7 +74,7 @@ async function submit() {
     <h1 id="auth-title">{{ isRegister ? 'Регистрация' : 'Вход' }}</h1>
     <div v-if="registered" class="auth-success" role="status">
       <p>Аккаунт {{ email }} создан. Теперь войдите с вашим паролем.</p>
-      <RouterLink class="primary-button" :to="{ name: 'login' }">Перейти ко входу</RouterLink>
+      <RouterLink class="primary-button" :to="{ name: 'login', query: route.query }">Перейти ко входу</RouterLink>
     </div>
     <form v-else class="auth-form" @submit.prevent="submit">
       <p>{{ isRegister ? 'Создайте аккаунт для покупок в магазине.' : 'Войдите в свой аккаунт.' }}</p>
@@ -88,7 +92,7 @@ async function submit() {
       </fieldset>
       <p class="auth-switch">
         {{ isRegister ? 'Уже есть аккаунт?' : 'Нет аккаунта?' }}
-        <RouterLink :to="{ name: isRegister ? 'login' : 'register' }">{{ isRegister ? 'Войти' : 'Зарегистрироваться' }}</RouterLink>
+        <RouterLink :to="{ name: isRegister ? 'login' : 'register', query: route.query }">{{ isRegister ? 'Войти' : 'Зарегистрироваться' }}</RouterLink>
       </p>
     </form>
   </section>

@@ -1,5 +1,5 @@
 export class ApiError extends Error {
-  constructor(public status: number) {
+  constructor(public status: number, public code?: string) {
     super(status >= 500
       ? 'Сервер временно недоступен. Попробуйте ещё раз.'
       : `Не удалось выполнить запрос (HTTP ${status}).`)
@@ -26,7 +26,12 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
       ...init, headers,
       signal: signal ? AbortSignal.any([signal, timeout.signal]) : timeout.signal,
     })
-    if (!response.ok) throw new ApiError(response.status)
+    if (!response.ok) {
+      const body = await response.json().catch(() => null)
+      const code = typeof body?.detail === 'string' && /^[a-z_]{1,80}$/.test(body.detail)
+        ? body.detail : undefined
+      throw new ApiError(response.status, code)
+    }
     return response.status === 204 ? undefined as T : await response.json()
   } catch (cause) {
     if (signal?.aborted) throw cause

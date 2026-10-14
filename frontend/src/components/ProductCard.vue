@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import type { Product } from '@/api/catalog.api'
+import ProductCartForm from '@/components/cart/ProductCartForm.vue'
+import { formatPrice } from '@/utils/format-price'
 
 const props = defineProps<{ product: Product; index: number }>()
 const imageFailed = ref(false)
 const availableSizes = computed(() => props.product.sizes.filter((size) => size.stock > 0))
-const price = computed(() => new Intl.NumberFormat('ru-RU', {
-  style: 'currency', currency: 'RUB', minimumFractionDigits: 0, maximumFractionDigits: 2,
-}).format(Number(props.product.price)))
+const price = computed(() => formatPrice(props.product.price))
 
 watch(() => props.product.image_url, () => { imageFailed.value = false })
 </script>
@@ -22,7 +22,7 @@ watch(() => props.product.image_url, () => { imageFailed.value = false })
     </div>
     <div class="product-heading"><h3>{{ product.name }}</h3><span class="product-price">{{ price }}</span></div>
     <p v-if="product.description" class="product-description">{{ product.description }}</p>
-    <div class="product-sizes"><span>Размеры</span><ul v-if="availableSizes.length" aria-label="Доступные размеры"><li v-for="size in availableSizes" :key="size.id">{{ Number(size.size) }}</li></ul><span v-else>—</span></div>
+    <ProductCartForm :product="product" />
   </article>
 </template>
 
@@ -118,30 +118,6 @@ h3 {
   line-height: 1.5;
   color: var(--color-muted);
   margin-bottom: 0;
-}
-
-.product-sizes {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 12px;
-  margin-top: 17px;
-  color: var(--color-muted);
-}
-
-.product-sizes ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.product-sizes li {
-  padding: 5px 7px;
-  border: 1px solid #d2d9cc;
-  color: var(--color-text);
 }
 
 @media (max-width: 600px) {

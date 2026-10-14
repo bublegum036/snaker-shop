@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
+import CartLink from '@/components/cart/CartLink.vue'
 
 const auth = useAuthStore()
 </script>
@@ -12,6 +13,7 @@ const auth = useAuthStore()
     <div class="header-account">
       <span v-if="auth.initializing" class="hint-text" role="status">Проверяем вход…</span>
       <template v-else-if="auth.isAuthenticated">
+        <CartLink />
         <RouterLink class="account-link" :to="{ name: 'account' }">{{ auth.user?.email }}</RouterLink>
         <button type="button" class="text-button" @click="auth.logout()">Выйти</button>
       </template>
