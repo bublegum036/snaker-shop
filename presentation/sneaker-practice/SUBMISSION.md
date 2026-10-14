@@ -16,6 +16,7 @@
 |Все операции карты|final_smoke.py|18 базовых парmethod/path и 3 операции размеров в OpenAPI и реальные вызовы|
 |Расширение: размеры и остатки|routers/inventory.py,schemas/inventory.py,services/inventory.py|57 проверок в inventory_checks.py: права,валидация,ссылки,покупка,гонки|
 |Расширение: идемпотентность checkout|models/idempotency.py,alembic/versions/0002_checkout_idempotency.py,services/orders.py|34 проверки повтора,перезапуска,отката,изоляции и HTTP-гонок; миграция сохраняет прежние данные|
+|Расширение: диагностика|core/request_logging.py,verify_logging.py|23 проверки UUID,ошибок,безопасного JSON и реального вывода Uvicorn|
 |Слои и конфигурация|app/models,schemas,routers,services,core|Карта слайдов 179–185;чистый запуск|
 |README с нуля|README.md|verify_final.py:временная копия/venv/пустаяБД|
 |Пять вопросов CONCEPT|CONCEPT.template.md|**Шаблон:ученику написать свой CONCEPT.md**|
@@ -27,7 +28,7 @@
 Идемпотентность добавляет заголовок к существующему POST /orders, поэтому
 число операций остаётся 21. Текущая схема: семь исходных таблиц и восьмая
 checkout_requests, head 0002. Общий свежий прогон: 134 финальные проверки,
-25 схемы/seed, 85 M2–M3 и 76 M4–M5, всего 320. Первичная миграция 0001
+23 диагностики, 25 схемы/seed, 85 M2–M3 и 76 M4–M5, всего 343. Первичная миграция 0001
 и семь базовых сущностей сохранены; расширения описаны в README.
 
 ## Передать на проверку

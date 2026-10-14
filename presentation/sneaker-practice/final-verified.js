@@ -10,17 +10,17 @@ window.SNEAKER_FINAL = {
     {
       "stage": "new venv",
       "passed": true,
-      "seconds": 1.01
+      "seconds": 0.97
     },
     {
       "stage": "install pinned requirements",
       "passed": true,
-      "seconds": 6.27
+      "seconds": 1.84
     },
     {
       "stage": "pip check",
       "passed": true,
-      "seconds": 0.12
+      "seconds": 0.11
     },
     {
       "stage": "generate local JWT key",
@@ -30,37 +30,42 @@ window.SNEAKER_FINAL = {
     {
       "stage": "migrate base schema",
       "passed": true,
-      "seconds": 2.8
+      "seconds": 0.48
     },
     {
       "stage": "verify idempotency migration preserves data",
       "passed": true,
-      "seconds": 0.3
+      "seconds": 0.31
     },
     {
       "stage": "seed catalog",
       "passed": true,
-      "seconds": 0.18
+      "seconds": 0.21
+    },
+    {
+      "stage": "safe HTTP diagnostics",
+      "passed": true,
+      "seconds": 1.2
     },
     {
       "stage": "final API acceptance",
       "passed": true,
-      "seconds": 5.96
+      "seconds": 5.41
     },
     {
       "stage": "schema and seed regression",
       "passed": true,
-      "seconds": 0.39
+      "seconds": 0.38
     },
     {
       "stage": "M2-M3 regression",
       "passed": true,
-      "seconds": 4.03
+      "seconds": 3.87
     },
     {
       "stage": "M4-M5 regression",
       "passed": true,
-      "seconds": 6.74
+      "seconds": 6.71
     }
   ],
   "checks": [
@@ -409,6 +414,33 @@ window.SNEAKER_FINAL = {
     }
   ],
   "total": "21970.00",
+  "diagnostics": {
+    "checks": [
+      "logging setup avoids duplicate handlers and disables raw access log",
+      "concurrent requests have independent UUIDs",
+      "response header matches request state",
+      "client supplied ID is not echoed",
+      "handled errors retain status and body plus request ID",
+      "unexpected error returns safe JSON even in debug mode",
+      "unknown route retains 404 plus request ID",
+      "one structured log per HTTP request",
+      "parallel log IDs match response IDs",
+      "logs carry method status duration and UTC timestamp",
+      "unexpected error logs safe type and source locations",
+      "unknown raw path is replaced",
+      "payload headers query path and exception text are absent from logs",
+      "post-start error is safely propagated without original message",
+      "partial response failure retains actual sent status",
+      "partial response failure omits sensitive message",
+      "non-HTTP lifecycle passes through without HTTP logs",
+      "real API keeps 200 404 401 422 responses",
+      "real API includes request IDs on every response",
+      "real logs correlate with headers and status codes",
+      "real logs use route templates",
+      "real server output omits raw URL tokens body and unknown paths",
+      "OpenAPI operation count remains 21"
+    ]
+  },
   "regression": {
     "schema": 25,
     "m23": 85,
