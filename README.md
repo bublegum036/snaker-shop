@@ -34,6 +34,11 @@
 
 Виртуальные окружения, node_modules, локальные .env, кэши и рабочие данные БД не включены. Все .env.example, зависимости, миграции и seed сохранены: окружение и учебные данные создаются по инструкции.
 
+## Vue-фронтенд
+
+[Первый этап фронтенда](frontend/README.md): Vue 3, TypeScript, Vite, Vue Router и Pinia.
+Каталог открывается на `http://127.0.0.1:4200` и получает товары из FastAPI через dev-прокси.
+
 ## Материалы сдачи
 
 [Матрица требований и комплект сдачи](presentation/sneaker-practice/SUBMISSION.md), [практика M6 и финал](presentation/sneaker-practice/M6-FINAL.md), [CONCEPT.template.md](presentation/sneaker-practice/CONCEPT.template.md). CONCEPT — шаблон для собственного ответа ученика; видео/скриншоты его Swagger нужно подготовить отдельно. Сохранённые отчёты описывают проверки эталона.

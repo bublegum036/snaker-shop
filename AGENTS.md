@@ -8,10 +8,12 @@ Git is initialized at the workspace root.
 
 ## Git workflow
 
-After completing each agreed stage and its relevant checks, create a local
-commit describing that stage. Keep unfinished changes out of stage-completion
-commits. Do not push, publish, or configure a remote without explicit user
-authorization. The current workflow is local only.
+Prepare and verify each agreed stage, then let the user review its code and
+architecture before committing. The user explicitly requested on 2026-10-14
+that commits must wait for their review; do not auto-commit completed stages.
+Once approved, create a local commit describing that stage. Keep unfinished
+changes out of stage-completion commits. Do not push, publish, or configure
+a remote without explicit user authorization. The current workflow is local only.
 
 ## Communication
 
