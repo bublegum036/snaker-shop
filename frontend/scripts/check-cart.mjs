@@ -14,17 +14,38 @@ const flush = () => new Promise((resolve) => setImmediate(resolve))
 const profile = { id: 9001, email: 'fixture@example.com', is_admin: false }
 const credentials = { email: profile.email, password: 'fixture-only-not-a-real-password' }
 const row = { id: 1, product_size_id: 302, product_id: 32, name: 'Fixture sneaker', size: '42.0', price: '5000.00', quantity: 1, stock: 3, subtotal: '5000.00' }
-let handler, apiCart, posts, lastBody, previous, passed = 0
+let handler, apiCart, posts, patches, deletes, lastBody, lastItemId, previous, passed = 0
 globalThis.fetch = (url, init) => handler(String(url), init)
 
 try {
-  const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth.store.ts')
-  const { useCartStore } = await server.ssrLoadModule('/src/stores/cart.store.ts')
+  const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth/auth.store.ts')
+  const { useCartStore } = await server.ssrLoadModule('/src/stores/cart/cart.store.ts')
   function defaultHandler(url, init) {
     if (url === '/api/auth/login') return Promise.resolve(json({ access_token: 'fixture-not-a-jwt', token_type: 'bearer' }))
     if (url === '/api/auth/me') return Promise.resolve(json(profile))
     assert.ok(init.headers.get('Authorization')?.startsWith('Bearer '))
     if (url === '/api/cart') return Promise.resolve(json(apiCart))
+    const itemPath = url.match(/^\/api\/cart\/items\/(\d+)$/)
+    if (itemPath) {
+      lastItemId = Number(itemPath[1])
+      const item = apiCart.items.find((item) => item.id === lastItemId)
+      if (init.method === 'PATCH') patches++
+      else { assert.equal(init.method, 'DELETE'); deletes++ }
+      if (!item) return Promise.resolve(json({ detail: 'cart_item_not_found' }, 404))
+      if (init.method === 'PATCH') {
+        lastBody = JSON.parse(init.body)
+        assert.deepEqual(Object.keys(lastBody), ['quantity'])
+        if (lastBody.quantity > item.stock) return Promise.resolve(json({ detail: 'insufficient_stock' }, 409))
+        apiCart.items = apiCart.items.map((current) => current.id === item.id
+          ? { ...current, quantity: lastBody.quantity, subtotal: `${lastBody.quantity * 5000}.00` } : current)
+      } else {
+        assert.equal(init.body, undefined)
+        apiCart.items = apiCart.items.filter((current) => current.id !== item.id)
+      }
+      apiCart.estimated_total = `${apiCart.items.reduce((sum, item) => sum + Number(item.subtotal), 0)}.00`
+      return Promise.resolve(init.method === 'DELETE'
+        ? new Response(null, { status: 204 }) : json(apiCart.items.find((current) => current.id === item.id)))
+    }
     assert.equal(url, '/api/cart/items')
     assert.equal(init.method, 'POST')
     posts++
@@ -44,6 +65,8 @@ try {
     handler = defaultHandler
     apiCart = { items: [], estimated_total: '0.00' }
     posts = 0
+    patches = 0
+    deletes = 0
     lastBody = undefined
     previous = { auth: useAuthStore(), cart: useCartStore() }
     return previous
@@ -195,6 +218,129 @@ try {
     assert.equal(auth.isAuthenticated, false)
     assert.equal(cart.data, null)
     assert.equal(cart.error, '')
+  })
+
+  await check('PATCH uses cart item ID and sets absolute quantity', async () => {
+    const { cart } = await signedIn()
+    await cart.addItem(302, 1)
+    assert.equal(await cart.updateItem(row.id, 2), true)
+    assert.equal(lastItemId, row.id)
+    assert.deepEqual(lastBody, { quantity: 2 })
+    assert.equal(cart.itemCount, 2)
+    assert.equal(cart.data.estimated_total, '10000.00')
+    await cart.updateItem(row.id, 2)
+    assert.equal(cart.itemCount, 2)
+    await cart.updateItem(row.id, 1)
+    assert.equal(cart.itemCount, 1)
+    assert.equal(cart.data.estimated_total, '5000.00')
+    assert.match(cart.notice, /Количество обновлено/)
+  })
+
+  await check('DELETE accepts empty 204 and refreshes total and badge', async () => {
+    const { cart } = await signedIn()
+    await cart.addItem(302, 1)
+    assert.equal(await cart.removeItem(row.id), true)
+    assert.equal(lastItemId, row.id)
+    assert.equal(deletes, 1)
+    assert.equal(cart.itemCount, 0)
+    assert.equal(cart.data.estimated_total, '0.00')
+    assert.match(cart.notice, /Позиция удалена/)
+  })
+
+  await check('invalid edit and delete values never reach API', async () => {
+    const { cart } = await signedIn()
+    await cart.addItem(302, 1)
+    for (const value of [0, -1, 1.5, NaN, 2147483648]) {
+      await assert.rejects(cart.updateItem(row.id, value))
+      await assert.rejects(cart.removeItem(value))
+    }
+    assert.equal(patches, 0)
+    assert.equal(deletes, 0)
+  })
+
+  await check('PATCH insufficient stock keeps server quantity intact', async () => {
+    const { cart } = await signedIn()
+    await cart.addItem(302, 1)
+    await assert.rejects(cart.updateItem(row.id, 4), /Недостаточно товара/)
+    assert.equal(apiCart.items[0].quantity, 1)
+    assert.equal(cart.data, null)
+    await cart.loadCart()
+    assert.equal(cart.itemCount, 1)
+  })
+
+  for (const action of ['updateItem', 'removeItem']) {
+    await check(`${action} handles a stale position with 404`, async () => {
+      const { cart } = await signedIn()
+      await cart.addItem(302, 1)
+      apiCart = { items: [], estimated_total: '0.00' }
+      await assert.rejects(cart[action](row.id, 2), /Позиция больше недоступна/)
+      await cart.loadCart()
+      assert.equal(cart.itemCount, 0)
+    })
+  }
+
+  for (const action of ['updateItem', 'removeItem']) {
+    await check(`confirmed ${action} plus failed GET is not repeated`, async () => {
+      const { cart } = await signedIn()
+      await cart.addItem(302, 1)
+      handler = (url, init) => url === '/api/cart' ? Promise.resolve(json({}, 503)) : defaultHandler(url, init)
+      assert.equal(await cart[action](row.id, 2), true)
+      assert.match(cart.error, action === 'updateItem' ? /Количество обновлено/ : /Позиция удалена/)
+      assert.equal(cart.data, null)
+      assert.equal(await cart[action](row.id, 2), false)
+      assert.equal(action === 'updateItem' ? patches : deletes, 1)
+      handler = defaultHandler
+      await cart.loadCart()
+      assert.equal(cart.itemCount, action === 'updateItem' ? 2 : 0)
+    })
+  }
+
+  await check('lost PATCH response reconciles without automatic repeat', async () => {
+    const { cart } = await signedIn()
+    await cart.addItem(302, 1)
+    handler = async (url, init) => {
+      const result = await defaultHandler(url, init)
+      if (init.method === 'PATCH') throw new TypeError('fixture lost PATCH response')
+      return result
+    }
+    await assert.rejects(cart.updateItem(row.id, 2), /Не удалось подтвердить изменение/)
+    assert.equal(patches, 1)
+    handler = defaultHandler
+    await cart.loadCart()
+    assert.equal(cart.itemCount, 2)
+  })
+
+  await check('late PATCH cannot replace cart of a new session', async () => {
+    const { auth, cart } = await signedIn()
+    await cart.addItem(302, 1)
+    let resolve
+    handler = (url, init) => init.method === 'PATCH'
+      ? new Promise((done) => { resolve = done }) : defaultHandler(url, init)
+    const pending = cart.updateItem(row.id, 2)
+    auth.logout()
+    apiCart = { items: [], estimated_total: '0.00' }
+    handler = defaultHandler
+    await auth.login(credentials)
+    await flush()
+    resolve(json({ ...row, quantity: 2 }))
+    assert.equal(await pending, false)
+    assert.equal(cart.itemCount, 0)
+    assert.equal(cart.notice, '')
+  })
+
+  await check('edit and delete share the write lock', async () => {
+    const { cart } = await signedIn()
+    await cart.addItem(302, 1)
+    let resolve
+    handler = (url, init) => init.method === 'PATCH'
+      ? new Promise((done) => { resolve = () => defaultHandler(url, init).then(done) }) : defaultHandler(url, init)
+    const pending = cart.updateItem(row.id, 2)
+    assert.equal(await cart.removeItem(row.id), false)
+    assert.equal(await cart.addItem(302, 1), false)
+    resolve()
+    await pending
+    assert.equal(patches, 1)
+    assert.equal(deletes, 0)
   })
 
   console.log(`Cart checks: ${passed} passed. No real accounts or database changes.`)

@@ -1,3 +1,4 @@
+import { authStoreTexts as text } from './auth.store.texts'
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { getProfile, login as loginRequest, type Credentials, type User } from '@/api/auth.api'
@@ -49,7 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
       return await requestJson<T>(path, { ...options, token })
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 401 && version === revision) {
-        logout('Сессия завершена. Войдите снова.')
+        logout(text.sessionEnded)
       }
       throw cause
     }
@@ -73,9 +74,9 @@ export const useAuthStore = defineStore('auth', () => {
       } catch (cause) {
         if (version !== revision) return
         if (cause instanceof ApiError && cause.status === 401) {
-          logout('Сессия завершена. Войдите снова.')
+          logout(text.sessionEnded)
         } else {
-          sessionError.value = 'Не удалось проверить вход. Повторите проверку или выйдите из сессии.'
+          sessionError.value = text.restoreFailed
         }
       } finally {
         if (version === revision) initializing.value = false

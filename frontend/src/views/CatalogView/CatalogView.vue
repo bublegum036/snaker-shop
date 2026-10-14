@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { catalogViewTexts as text } from './CatalogView.texts'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { getBrands, getProducts, type Brand, type Product, type ProductFilters } from '@/api/catalog.api'
-import ProductCard from '@/components/ProductCard.vue'
-import CatalogFilters from '@/components/CatalogFilters.vue'
+import ProductCard from '@/components/catalog/ProductCard/ProductCard.vue'
+import CatalogFilters from '@/components/catalog/CatalogFilters/CatalogFilters.vue'
 
 const products = ref<Product[]>([])
 const loading = ref(true)
@@ -40,8 +41,8 @@ async function loadProducts(targetPage = page.value) {
   } catch (cause) {
     if (!request.signal.aborted) {
       error.value = cause instanceof TypeError
-        ? 'Нет связи с каталогом. Попробуйте ещё раз.'
-        : cause instanceof Error ? cause.message : 'Не удалось загрузить каталог.'
+        ? text.networkError
+        : cause instanceof Error ? cause.message : text.loadError
     }
   } finally {
     if (productRequest === request) loading.value = false
@@ -58,7 +59,7 @@ async function loadBrands() {
     const result = await getBrands(request.signal)
     if (!request.signal.aborted) brands.value = result
   } catch {
-    if (!request.signal.aborted) brandsError.value = 'Не удалось загрузить бренды.'
+    if (!request.signal.aborted) brandsError.value = text.brandsError
   } finally {
     if (brandRequest === request) brandsLoading.value = false
   }
@@ -82,37 +83,37 @@ onBeforeUnmount(() => {
 <template>
   <section class="catalog" aria-labelledby="catalog-title">
     <div class="catalog-intro">
-      <div><p class="eyebrow">Коллекция / 01</p><h1 id="catalog-title">Твой следующий<br><span>шаг.</span></h1></div>
-      <p class="intro-description">Для городских маршрутов<br>и новых направлений.</p>
+      <div><p class="eyebrow">{{ text.collection }}</p><h1 id="catalog-title">{{ text.titleFirstLine }}<br><span>{{ text.titleSecondLine }}</span></h1></div>
+      <p class="intro-description">{{ text.introFirstLine }}<br>{{ text.introSecondLine }}</p>
     </div>
     <CatalogFilters
       :brands="brands" :busy="loading" :brands-loading="brandsLoading" :brands-error="brandsError"
       @apply="applyFilters" @retry-brands="loadBrands"
     />
     <div class="catalog-toolbar">
-      <h2>Каталог <span v-if="!loading && !error">/ на странице: {{ products.length }}</span></h2>
-      <button type="button" class="text-button" :disabled="loading" @click="loadProducts()">Обновить каталог ↗</button>
+      <h2>{{ text.catalog }} <span v-if="!loading && !error">{{ text.count(products.length) }}</span></h2>
+      <button type="button" class="text-button" :disabled="loading" @click="loadProducts()">{{ text.refresh }}</button>
     </div>
-    <p v-if="loading" class="catalog-message" role="status">Загружаем коллекцию…</p>
+    <p v-if="loading" class="catalog-message" role="status">{{ text.loading }}</p>
     <div v-else-if="error" class="catalog-message error-message" role="alert">
-      <p>{{ error }}</p><button type="button" @click="loadProducts(requestedPage)">Повторить запрос</button>
+      <p>{{ error }}</p><button type="button" @click="loadProducts(requestedPage)">{{ text.retry }}</button>
     </div>
-    <p v-else-if="products.length === 0" class="catalog-message" role="status">Товары не найдены. Измените фильтры или сбросьте их.</p>
-    <ul v-else class="product-grid" aria-label="Товары">
+    <p v-else-if="products.length === 0" class="catalog-message" role="status">{{ text.empty }}</p>
+    <ul v-else class="product-grid" :aria-label="text.productsLabel">
       <li v-for="(product, index) in products" :key="product.id">
         <ProductCard :product="product" :index="firstItemIndex + index" />
       </li>
     </ul>
-    <nav class="catalog-pagination" aria-label="Страницы каталога">
-      <label>На странице
+    <nav class="catalog-pagination" :aria-label="text.paginationLabel">
+      <label>{{ text.pageSize }}
         <select v-model="pageSize" :disabled="loading" @change="loadProducts(1)">
           <option :value="3">3</option><option :value="12">12</option><option :value="24">24</option>
         </select>
       </label>
-      <span v-if="!loading && !error" role="status">Страница {{ page }}</span>
+      <span v-if="!loading && !error" role="status">{{ text.page(page) }}</span>
       <div>
-        <button type="button" class="secondary-button" :disabled="loading || !!error || page === 1" @click="loadProducts(page - 1)">Назад</button>
-        <button type="button" class="secondary-button" :disabled="loading || !!error || !hasNextPage" @click="loadProducts(page + 1)">Далее</button>
+        <button type="button" class="secondary-button" :disabled="loading || !!error || page === 1" @click="loadProducts(page - 1)">{{ text.previous }}</button>
+        <button type="button" class="secondary-button" :disabled="loading || !!error || !hasNextPage" @click="loadProducts(page + 1)">{{ text.next }}</button>
       </div>
     </nav>
   </section>

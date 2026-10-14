@@ -1,3 +1,4 @@
+import { catalogApiTexts as text } from './catalog.api.texts'
 // Decimal приходит из FastAPI строкой: точность цены сохраняется на сервере.
 export interface ProductSize {
   id: number
@@ -41,13 +42,13 @@ export async function getProducts(query: CatalogQuery, signal?: AbortSignal): Pr
   }
   const response = await fetch(`/api/products?${params}`, { signal })
   if (!response.ok) {
-    throw new Error(`Не удалось загрузить каталог (HTTP ${response.status}). Попробуйте ещё раз.`)
+    throw new Error(text.productsFailed(response.status))
   }
   return response.json()
 }
 
 export async function getBrands(signal?: AbortSignal): Promise<Brand[]> {
   const response = await fetch('/api/brands', { signal })
-  if (!response.ok) throw new Error(`Не удалось загрузить бренды (HTTP ${response.status}).`)
+  if (!response.ok) throw new Error(text.brandsFailed(response.status))
   return response.json()
 }

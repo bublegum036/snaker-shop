@@ -26,7 +26,7 @@ const key = 'north.access-token'
 let passed = 0
 
 try {
-  const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth.store.ts')
+  const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth/auth.store.ts')
   const authApi = await server.ssrLoadModule('/src/api/auth.api.ts')
   const { requestJson } = await server.ssrLoadModule('/src/api/http.client.ts')
   const { watchSessionNavigation } = await server.ssrLoadModule('/src/router/session-navigation.ts')

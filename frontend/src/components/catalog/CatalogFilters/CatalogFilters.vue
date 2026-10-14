@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { catalogFiltersTexts as text } from './CatalogFilters.texts'
 import { reactive, ref } from 'vue'
 import type { Brand, ProductFilters } from '@/api/catalog.api'
 
@@ -24,7 +25,7 @@ const validationError = ref('')
 function apply() {
   validationError.value = ''
   if (form.minPrice !== '' && form.maxPrice !== '' && form.minPrice > form.maxPrice) {
-    validationError.value = 'Цена «от» не должна превышать цену «до».'
+    validationError.value = text.invalidPriceRange
     return
   }
   emit('apply', {
@@ -44,40 +45,40 @@ function reset() {
 </script>
 
 <template>
-  <form class="catalog-filters" aria-label="Фильтры каталога" @submit.prevent="apply">
+  <form class="catalog-filters" :aria-label="text.formLabel" @submit.prevent="apply">
     <fieldset :disabled="busy">
-      <legend class="visually-hidden">Поиск и фильтры</legend>
+      <legend class="visually-hidden">{{ text.legend }}</legend>
       <div class="filter-fields">
-        <label class="search-field">Название
-          <input v-model.trim="form.search" type="search" maxlength="100" placeholder="Например, North">
+        <label class="search-field">{{ text.name }}
+          <input v-model.trim="form.search" type="search" maxlength="100" :placeholder="text.namePlaceholder">
         </label>
-        <label>Бренд
+        <label>{{ text.brand }}
           <select v-model="form.brandId" :disabled="brandsLoading || !!brandsError">
-            <option value="">Все бренды</option>
+            <option value="">{{ text.allBrands }}</option>
             <option v-for="brand in brands" :key="brand.id" :value="brand.id">{{ brand.name }}</option>
           </select>
         </label>
-        <label>Размер в наличии
-          <input v-model="form.size" type="number" min="0.1" max="999" step="0.1" placeholder="Любой">
+        <label>{{ text.size }}
+          <input v-model="form.size" type="number" min="0.1" max="999" step="0.1" :placeholder="text.sizePlaceholder">
         </label>
-        <label>Цена от, ₽
-          <input v-model="form.minPrice" type="number" min="0" step="0.01" placeholder="0">
+        <label>{{ text.minPrice }}
+          <input v-model="form.minPrice" type="number" min="0" step="0.01" :placeholder="text.minPricePlaceholder">
         </label>
-        <label>Цена до, ₽
-          <input v-model="form.maxPrice" type="number" min="0" step="0.01" placeholder="Без ограничений">
+        <label>{{ text.maxPrice }}
+          <input v-model="form.maxPrice" type="number" min="0" step="0.01" :placeholder="text.maxPricePlaceholder">
         </label>
       </div>
       <p v-if="validationError" class="error-text" role="alert">{{ validationError }}</p>
       <div class="filter-actions">
-        <button type="submit" class="primary-button">Применить</button>
-        <button type="button" class="secondary-button" @click="reset">Сбросить</button>
-        <span class="hint-text">Изменения применяются по кнопке или Enter.</span>
+        <button type="submit" class="primary-button">{{ text.apply }}</button>
+        <button type="button" class="secondary-button" @click="reset">{{ text.reset }}</button>
+        <span class="hint-text">{{ text.hint }}</span>
       </div>
     </fieldset>
-    <p v-if="brandsLoading" class="hint-text" role="status">Загружаем бренды…</p>
+    <p v-if="brandsLoading" class="hint-text" role="status">{{ text.brandsLoading }}</p>
     <div v-else-if="brandsError" class="brands-error error-text" role="alert">
-      <span>{{ brandsError }} Остальные фильтры доступны.</span>
-      <button type="button" class="text-button" @click="emit('retryBrands')">Повторить загрузку брендов</button>
+      <span>{{ brandsError }} {{ text.otherFiltersAvailable }}</span>
+      <button type="button" class="text-button" @click="emit('retryBrands')">{{ text.retryBrands }}</button>
     </div>
   </form>
 </template>

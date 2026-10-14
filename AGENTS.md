@@ -101,6 +101,18 @@ Use `*.api.ts` for domain API modules, `*.store.ts` for Pinia stores, and
 `http.client.ts` for the shared HTTP client. Keep component styles and their
 media queries in `<style scoped>`; global styles are for theme, base rules,
 shared controls and utilities.
+Keep user-facing component text in adjacent `ComponentName.texts.ts` modules
+using `as const` objects and typed formatting functions. Keep store/API messages
+in adjacent `*.texts.ts` modules too; templates should reference these constants.
+Technical strings (routes, CSS classes, event names, API codes) stay with logic.
+Keep each component and its texts in a `ComponentName/` folder, grouped under
+`components/catalog/`, `components/cart/`, `components/auth/` or
+`components/layout/`. Give each page its own `views/ViewName/` folder too.
+Import `.vue` files directly; do not add a barrel file for every component.
+Keep the root `src/App.vue` and shared API/store/router modules in their roles.
+Group each Pinia store with its texts in `stores/<domain>/`, for example
+`stores/cart/cart.store.ts` and `stores/cart/cart.store.texts.ts`.
+Update direct imports and isolated SSR check paths when moving stores.
 
 Keep local `.env` values, passwords, and JWTs out of source and tool output.
 Preserve existing local configuration. Seed is additive and does not reset

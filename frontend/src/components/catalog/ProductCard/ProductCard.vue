@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { productCardTexts as text } from './ProductCard.texts'
 import { computed, ref, watch } from 'vue'
 import type { Product } from '@/api/catalog.api'
-import ProductCartForm from '@/components/cart/ProductCartForm.vue'
+import ProductCartForm from '@/components/cart/ProductCartForm/ProductCartForm.vue'
 import { formatPrice } from '@/utils/format-price'
 
 const props = defineProps<{ product: Product; index: number }>()
@@ -15,10 +16,10 @@ watch(() => props.product.image_url, () => { imageFailed.value = false })
 <template>
   <article class="product-card">
     <div class="product-visual" :class="`tone-${index % 3}`">
-      <span class="product-number">{{ String(index + 1).padStart(2, '0') }} / NORTH</span>
+      <span class="product-number">{{ String(index + 1).padStart(2, '0') }} / {{ text.brand }}</span>
       <img v-if="product.image_url && !imageFailed" :src="product.image_url" :alt="product.name" loading="lazy" @error="imageFailed = true">
-      <div v-else class="product-placeholder"><span aria-hidden="true">N<span class="placeholder-dot">.</span></span><small>Фото скоро появится</small></div>
-      <span class="stock-badge">{{ availableSizes.length ? 'В наличии' : 'Нет в наличии' }}</span>
+      <div v-else class="product-placeholder"><span aria-hidden="true">{{ text.monogram }}<span class="placeholder-dot">{{ text.monogramDot }}</span></span><small>{{ text.photoPending }}</small></div>
+      <span class="stock-badge">{{ availableSizes.length ? text.inStock : text.unavailable }}</span>
     </div>
     <div class="product-heading"><h3>{{ product.name }}</h3><span class="product-price">{{ price }}</span></div>
     <p v-if="product.description" class="product-description">{{ product.description }}</p>

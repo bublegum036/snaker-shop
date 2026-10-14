@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { productCartFormTexts as text } from './ProductCartForm.texts'
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import type { Product } from '@/api/catalog.api'
-import { useAuthStore } from '@/stores/auth.store'
-import { useCartStore } from '@/stores/cart.store'
+import { useAuthStore } from '@/stores/auth/auth.store'
+import { useCartStore } from '@/stores/cart/cart.store'
 
 const props = defineProps<{ product: Product }>()
 const auth = useAuthStore()
@@ -35,48 +36,48 @@ async function add() {
   error.value = ''
   message.value = ''
   if (typeof quantity.value !== 'number' || !Number.isInteger(quantity.value) || quantity.value < 1 || quantity.value > remaining.value) {
-    error.value = 'Укажите целое количество в пределах доступного остатка.'
+    error.value = text.invalidQuantity
     return
   }
   try {
     if (await cart.addItem(sizeId.value, quantity.value)) {
       quantity.value = 1
-      message.value = 'Товар добавлен в корзину.'
+      message.value = text.added
     }
   } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : 'Не удалось добавить товар.'
+    error.value = cause instanceof Error ? cause.message : text.addFailed
   }
 }
 </script>
 
 <template>
-  <form class="product-cart-form" :aria-label="`Добавление ${product.name} в корзину`" @submit.prevent="add">
+  <form class="product-cart-form" :aria-label="text.addLabel(product.name)" @submit.prevent="add">
     <fieldset v-if="product.sizes.length" :disabled="busy">
-      <legend>Размер</legend>
+      <legend>{{ text.size }}</legend>
       <div class="size-options">
         <label v-for="size in product.sizes" :key="size.id" :class="{ unavailable: size.stock === 0 }">
           <input v-model="sizeId" type="radio" :name="`size-${product.id}`" :value="size.id" :disabled="size.stock === 0">
-          <span>{{ Number(size.size) }}{{ size.stock === 0 ? ' — нет' : '' }}</span>
+          <span>{{ Number(size.size) }}{{ size.stock === 0 ? text.unavailableSize : '' }}</span>
         </label>
       </div>
     </fieldset>
-    <p v-else class="hint-text">Размеры пока не добавлены.</p>
+    <p v-else class="hint-text">{{ text.noSizes }}</p>
     <template v-if="auth.isAuthenticated">
       <p v-if="cart.error" class="error-text" role="alert">{{ cart.error }}</p>
-      <button v-if="!cart.data && !busy" type="button" class="text-button" @click="cart.loadCart()">Обновить корзину</button>
-      <p v-if="cart.loading" class="hint-text" role="status">Проверяем корзину…</p>
+      <button v-if="!cart.data && !busy" type="button" class="text-button" @click="cart.loadCart()">{{ text.refresh }}</button>
+      <p v-if="cart.loading" class="hint-text" role="status">{{ text.checking }}</p>
       <template v-if="selectedSize && cart.data">
-        <p class="hint-text">Можно добавить: {{ remaining }}</p>
-        <label class="quantity-field">Количество
-          <input v-model="quantity" type="number" min="1" :max="Math.max(1, remaining)" step="1" required :disabled="busy || remaining === 0">
+        <p class="hint-text">{{ text.remaining(remaining) }}</p>
+        <label class="quantity-field">{{ text.quantity }}
+          <input v-model="quantity" type="number" min="1" :max="remaining" step="1" required :disabled="busy || remaining === 0">
         </label>
       </template>
-      <p v-else-if="!sizeId && product.sizes.length" class="hint-text">Выберите размер.</p>
-      <button type="submit" class="primary-button" :disabled="!canAdd">{{ cart.mutating ? 'Добавляем…' : 'В корзину' }}</button>
+      <p v-else-if="!sizeId && product.sizes.length" class="hint-text">{{ text.chooseSize }}</p>
+      <button type="submit" class="primary-button" :disabled="!canAdd">{{ cart.mutating ? text.adding : text.add }}</button>
     </template>
-    <RouterLink v-else-if="!auth.initializing" class="login-link" :to="{ name: 'login', query: { next: 'catalog' } }">Войдите, чтобы добавить товар</RouterLink>
+    <RouterLink v-else-if="!auth.initializing" class="login-link" :to="{ name: 'login', query: { next: 'catalog' } }">{{ text.signIn }}</RouterLink>
     <p v-if="error && error !== cart.error" class="error-text" role="alert">{{ error }}</p>
-    <p v-if="message" class="hint-text" role="status">{{ message }} <RouterLink :to="{ name: 'cart' }">Открыть корзину</RouterLink></p>
+    <p v-if="message" class="hint-text" role="status">{{ message }} <RouterLink :to="{ name: 'cart' }">{{ text.openCart }}</RouterLink></p>
   </form>
 </template>
 

@@ -1,0 +1,18 @@
+export const productCartFormTexts = {
+  size: 'Размер',
+  unavailableSize: ' — нет',
+  noSizes: 'Размеры пока не добавлены.',
+  refresh: 'Обновить корзину',
+  checking: 'Проверяем корзину…',
+  quantity: 'Количество',
+  chooseSize: 'Выберите размер.',
+  adding: 'Добавляем…',
+  add: 'В корзину',
+  signIn: 'Войдите, чтобы добавить товар',
+  openCart: 'Открыть корзину',
+  added: 'Товар добавлен в корзину.',
+  invalidQuantity: 'Укажите целое количество в пределах доступного остатка.',
+  addFailed: 'Не удалось добавить товар.',
+  addLabel: (name: string) => `Добавление ${name} в корзину`,
+  remaining: (count: number) => `Можно добавить: ${count}`,
+} as const

@@ -1,25 +1,26 @@
 <script setup lang="ts">
+import { appHeaderTexts as text } from './AppHeader.texts'
 import { RouterLink } from 'vue-router'
-import { useAuthStore } from '@/stores/auth.store'
-import CartLink from '@/components/cart/CartLink.vue'
+import { useAuthStore } from '@/stores/auth/auth.store'
+import CartLink from '@/components/cart/CartLink/CartLink.vue'
 
 const auth = useAuthStore()
 </script>
 
 <template>
   <header class="site-header">
-    <RouterLink class="wordmark" to="/" aria-label="North — главная">north<span>®</span></RouterLink>
-    <nav aria-label="Основная навигация"><RouterLink to="/">Каталог</RouterLink></nav>
+    <RouterLink class="wordmark" to="/" :aria-label="text.homeLabel">{{ text.wordmark }}<span>{{ text.trademark }}</span></RouterLink>
+    <nav :aria-label="text.navigation"><RouterLink to="/">{{ text.catalog }}</RouterLink></nav>
     <div class="header-account">
-      <span v-if="auth.initializing" class="hint-text" role="status">Проверяем вход…</span>
+      <span v-if="auth.initializing" class="hint-text" role="status">{{ text.checking }}</span>
       <template v-else-if="auth.isAuthenticated">
         <CartLink />
         <RouterLink class="account-link" :to="{ name: 'account' }">{{ auth.user?.email }}</RouterLink>
-        <button type="button" class="text-button" @click="auth.logout()">Выйти</button>
+        <button type="button" class="text-button" @click="auth.logout()">{{ text.logout }}</button>
       </template>
       <template v-else>
-        <RouterLink :to="{ name: 'login' }">Войти</RouterLink>
-        <RouterLink :to="{ name: 'register' }">Регистрация</RouterLink>
+        <RouterLink :to="{ name: 'login' }">{{ text.login }}</RouterLink>
+        <RouterLink :to="{ name: 'register' }">{{ text.register }}</RouterLink>
       </template>
     </div>
   </header>

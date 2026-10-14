@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth.store'
+import { sessionMessagesTexts as text } from './SessionMessages.texts'
+import { useAuthStore } from '@/stores/auth/auth.store'
 
 const auth = useAuthStore()
 </script>
@@ -9,9 +10,9 @@ const auth = useAuthStore()
   <div v-if="auth.sessionError" class="session-message" role="alert">
     <p>{{ auth.sessionError }}</p>
     <button type="button" class="secondary-button" :disabled="auth.initializing" @click="auth.restoreSession()">
-      Повторить проверку входа
+      {{ text.retry }}
     </button>
-    <button type="button" class="text-button" @click="auth.logout()">Выйти из сессии</button>
+    <button type="button" class="text-button" @click="auth.logout()">{{ text.logout }}</button>
   </div>
 </template>
 

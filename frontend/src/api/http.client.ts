@@ -1,8 +1,9 @@
+import { httpClientTexts as text } from './http.client.texts'
 export class ApiError extends Error {
   constructor(public status: number, public code?: string) {
     super(status >= 500
-      ? 'Сервер временно недоступен. Попробуйте ещё раз.'
-      : `Не удалось выполнить запрос (HTTP ${status}).`)
+      ? text.serverUnavailable
+      : text.requestFailed(status))
   }
 }
 
@@ -12,7 +13,7 @@ interface RequestOptions extends RequestInit {
 
 // Отправляем JWT только в локальный API; пароль и ответы с токеном не логируем.
 export async function requestJson<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  if (!path.startsWith('/') || path.startsWith('//')) throw new Error('Некорректный путь API.')
+  if (!path.startsWith('/') || path.startsWith('//')) throw new Error(text.invalidPath)
   const { token, signal, ...init } = options
   const headers = new Headers(init.headers)
   headers.set('Accept', 'application/json')
@@ -35,8 +36,8 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
     return response.status === 204 ? undefined as T : await response.json()
   } catch (cause) {
     if (signal?.aborted) throw cause
-    if (timeout.signal.aborted) throw new Error('Сервер не ответил вовремя. Попробуйте ещё раз.')
-    if (cause instanceof TypeError) throw new Error('Нет связи с сервером. Попробуйте ещё раз.')
+    if (timeout.signal.aborted) throw new Error(text.timeout)
+    if (cause instanceof TypeError) throw new Error(text.networkError)
     throw cause
   } finally {
     clearTimeout(timer)

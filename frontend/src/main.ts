@@ -4,7 +4,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import './styles.css'
-import { useAuthStore } from './stores/auth.store'
+import { useAuthStore } from './stores/auth/auth.store'
 import { watchSessionNavigation } from './router/session-navigation'
 
 const app = createApp(App)

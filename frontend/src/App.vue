@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import AppHeader from '@/components/layout/AppHeader.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
-import SessionMessages from '@/components/auth/SessionMessages.vue'
+import AppHeader from '@/components/layout/AppHeader/AppHeader.vue'
+import AppFooter from '@/components/layout/AppFooter/AppFooter.vue'
+import SessionMessages from '@/components/auth/SessionMessages/SessionMessages.vue'
 </script>
 
 <template>

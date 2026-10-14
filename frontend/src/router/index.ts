@@ -1,9 +1,10 @@
+import { routerTexts as text } from './router.texts'
 import { createRouter, createWebHistory } from 'vue-router'
-import CatalogView from '@/views/CatalogView.vue'
-import AuthView from '@/views/AuthView.vue'
-import AccountView from '@/views/AccountView.vue'
-import CartView from '@/views/CartView.vue'
-import { useAuthStore } from '@/stores/auth.store'
+import CatalogView from '@/views/CatalogView/CatalogView.vue'
+import AuthView from '@/views/AuthView/AuthView.vue'
+import AccountView from '@/views/AccountView/AccountView.vue'
+import CartView from '@/views/CartView/CartView.vue'
+import { useAuthStore } from '@/stores/auth/auth.store'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,10 +28,7 @@ router.beforeEach(async (to) => {
 })
 
 router.afterEach((to) => {
-  const titles: Record<string, string> = {
-    catalog: 'Каталог кроссовок', login: 'Вход', register: 'Регистрация', account: 'Ваш профиль', cart: 'Корзина',
-  }
-  document.title = `${titles[String(to.name)] ?? 'Магазин кроссовок'} — North`
+  document.title = text.pageTitle(String(to.name))
 })
 
 export default router

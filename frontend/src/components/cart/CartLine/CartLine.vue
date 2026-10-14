@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { cartLineTexts as text } from './CartLine.texts'
 import type { CartItem } from '@/api/cart.api'
 import { formatPrice } from '@/utils/format-price'
+import CartItemActions from '@/components/cart/CartItemActions/CartItemActions.vue'
 
 defineProps<{ item: CartItem }>()
 </script>
@@ -9,10 +11,11 @@ defineProps<{ item: CartItem }>()
   <article class="cart-line">
     <div>
       <h2>{{ item.name }}</h2>
-      <p class="hint-text">Размер {{ Number(item.size) }} · {{ formatPrice(item.price) }} за пару</p>
-      <p v-if="item.quantity > item.stock" class="error-text">Остаток изменился: доступно {{ item.stock }}.</p>
+      <p class="hint-text">{{ text.details(item.size, formatPrice(item.price)) }}</p>
+      <p v-if="item.quantity > item.stock" class="error-text">{{ text.stockChanged(item.stock) }}</p>
+      <CartItemActions :item="item" />
     </div>
-    <span>{{ item.quantity }} шт.</span>
+    <span>{{ text.quantity(item.quantity) }}</span>
     <strong>{{ formatPrice(item.subtotal) }}</strong>
   </article>
 </template>

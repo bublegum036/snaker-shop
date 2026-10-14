@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { accountViewTexts as text } from './AccountView.texts'
 import { ref } from 'vue'
-import { useAuthStore } from '@/stores/auth.store'
+import { useAuthStore } from '@/stores/auth/auth.store'
 
 const auth = useAuthStore()
 const loading = ref(false)
@@ -11,22 +12,22 @@ async function refresh() {
   error.value = ''
   try { await auth.refreshProfile() }
   catch (cause) {
-    error.value = cause instanceof Error ? cause.message : 'Не удалось обновить профиль.'
+    error.value = cause instanceof Error ? cause.message : text.refreshFailed
   } finally { loading.value = false }
 }
 </script>
 
 <template>
   <section v-if="auth.user" class="auth-page" aria-labelledby="account-title">
-    <p class="eyebrow">Личный кабинет</p>
-    <h1 id="account-title">Ваш профиль</h1>
+    <p class="eyebrow">{{ text.account }}</p>
+    <h1 id="account-title">{{ text.title }}</h1>
     <dl class="profile-details">
-      <div><dt>Email</dt><dd>{{ auth.user.email }}</dd></div>
-      <div><dt>Номер пользователя</dt><dd>{{ auth.user.id }}</dd></div>
-      <div><dt>Роль</dt><dd>{{ auth.user.is_admin ? 'Администратор' : 'Покупатель' }}</dd></div>
+      <div><dt>{{ text.email }}</dt><dd>{{ auth.user.email }}</dd></div>
+      <div><dt>{{ text.userId }}</dt><dd>{{ auth.user.id }}</dd></div>
+      <div><dt>{{ text.role }}</dt><dd>{{ auth.user.is_admin ? text.admin : text.customer }}</dd></div>
     </dl>
     <p v-if="error" class="error-text" role="alert">{{ error }}</p>
-    <button type="button" class="secondary-button" :disabled="loading" @click="refresh">{{ loading ? 'Обновляем…' : 'Обновить профиль' }}</button>
+    <button type="button" class="secondary-button" :disabled="loading" @click="refresh">{{ loading ? text.loading : text.refresh }}</button>
   </section>
 </template>
 

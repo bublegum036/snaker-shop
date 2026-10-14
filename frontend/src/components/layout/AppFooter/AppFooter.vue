@@ -1,7 +1,11 @@
+<script setup lang="ts">
+import { appFooterTexts as text } from './AppFooter.texts'
+</script>
+
 <template>
   <footer class="site-footer">
-    <span>NORTH / SNEAKER STORE</span>
-    <span>Найди свою пару.</span>
+    <span>{{ text.brand }}</span>
+    <span>{{ text.slogan }}</span>
   </footer>
 </template>
 
