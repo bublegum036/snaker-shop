@@ -94,7 +94,10 @@ JavaScript copies consistent when editing them.
 For frontend stages, run `npm run build` from `frontend/` with a compatible
 Node.js (the working local version is 22.12). For authentication changes,
 also run `npm run check:auth`; these isolated checks do not touch real accounts.
-For cart changes, also run `npm run check:cart`. Preserve server totals,
+For cart changes, also run `npm run check:cart`; for checkout changes run
+`npm run check:checkout` too. Preserve pending checkout keys across retries and
+reloads, scope them to the user, and block cart mutations until the result is known.
+Preserve server totals,
 session isolation and the rule that uncertain additive POSTs are not auto-retried.
 Keep session tokens and passwords out of source, logs, screenshots, and reports.
 Use `*.api.ts` for domain API modules, `*.store.ts` for Pinia stores, and

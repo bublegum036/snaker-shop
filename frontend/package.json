@@ -13,7 +13,8 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "check:auth": "node scripts/check-auth.mjs",
-    "check:cart": "node scripts/check-cart.mjs"
+    "check:cart": "node scripts/check-cart.mjs",
+    "check:checkout": "node scripts/check-checkout.mjs"
   },
   "dependencies": {
     "pinia": "^3.0.3",

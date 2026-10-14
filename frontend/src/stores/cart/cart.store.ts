@@ -5,6 +5,9 @@ import { addCartItem, getCart, removeCartItem, updateCartItem, type Cart } from 
 import { ApiError } from '@/api/http.client'
 import { useAuthStore } from '@/stores/auth/auth.store'
 
+import { checkout as checkoutRequest, type Order } from '@/api/orders.api'
+import { checkoutTexts } from './checkout.texts'
+
 import type { CartAction } from './cart.store.texts'
 
 function getMutationErrorMessage(cause: unknown, action: CartAction): string {
@@ -31,6 +34,10 @@ export const useCartStore = defineStore('cart', () => {
   const mutating = ref(false)
   const error = ref('')
   const notice = ref('')
+  const order = ref<Order | null>(null)
+  const checkoutError = ref('')
+  const pendingKey = ref<string | null>(null)
+  const checkoutPending = computed(() => pendingKey.value !== null)
   const itemCount = computed(() => data.value?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0)
   let revision = 0
   let readRequest: AbortController | undefined
@@ -41,6 +48,9 @@ export const useCartStore = defineStore('cart', () => {
     readRequest?.abort()
     writeRequest?.abort()
     data.value = null
+    order.value = null
+    checkoutError.value = ''
+    pendingKey.value = null
     error.value = ''
     notice.value = ''
     loading.value = false
@@ -71,7 +81,7 @@ export const useCartStore = defineStore('cart', () => {
 
   async function mutateCart(action: CartAction, write: (signal: AbortSignal) => Promise<unknown>): Promise<boolean> {
     if (!auth.isAuthenticated) throw new Error(text.loginRequired)
-    if (mutating.value || loading.value || !data.value || error.value) return false
+    if (mutating.value || loading.value || checkoutPending.value || !data.value || error.value) return false
     notice.value = ''
     readRequest?.abort()
     const request = new AbortController()
@@ -126,11 +136,84 @@ export const useCartStore = defineStore('cart', () => {
     return mutateCart('remove', (signal) => removeCartItem(auth.authorizedRequest, itemId, signal))
   }
 
+  function checkoutStorageKey() {
+    return `north.checkout.${auth.user!.id}`
+  }
+
+  function clearCheckoutKey(storageKey: string) {
+    try {
+      sessionStorage.removeItem(storageKey)
+      pendingKey.value = null
+      return true
+    } catch {
+      checkoutError.value = checkoutTexts.storageUnavailable
+      return false
+    }
+  }
+
+  async function placeOrder(): Promise<boolean> {
+    if (!auth.isAuthenticated || mutating.value || loading.value) return false
+    // Повтор с сохранённым ключом допустим даже при уже пустой корзине.
+    if (!pendingKey.value && (!data.value?.items.length || error.value)) return false
+    const storageKey = checkoutStorageKey()
+    checkoutError.value = ''
+    try {
+      const key = pendingKey.value ?? sessionStorage.getItem(storageKey) ?? crypto.randomUUID()
+      sessionStorage.setItem(storageKey, key)
+      if (sessionStorage.getItem(storageKey) !== key) throw new Error(checkoutTexts.storageUnavailable)
+      pendingKey.value = key
+    } catch {
+      checkoutError.value = checkoutTexts.storageUnavailable
+      return false
+    }
+    const key = pendingKey.value!
+    const request = new AbortController()
+    writeRequest = request
+    const version = revision
+    mutating.value = true
+    notice.value = ''
+    order.value = null
+    try {
+      const result = await checkoutRequest(auth.authorizedRequest, key, request.signal)
+      if (version !== revision || request.signal.aborted) return false
+      order.value = result
+      clearCheckoutKey(storageKey)
+      // POST уже подтверждён; не превращаем сбой чтения в повторную покупку.
+      data.value = null
+      error.value = ''
+      try {
+        const result = await getCart(auth.authorizedRequest, request.signal)
+        if (version === revision && !request.signal.aborted) data.value = result
+      } catch {
+        if (version === revision && !request.signal.aborted) error.value = checkoutTexts.refreshFailed
+      }
+      return version === revision && !request.signal.aborted
+    } catch (cause) {
+      if (version !== revision || request.signal.aborted) return false
+      // Только однозначный отказ 4xx позволяет начать новое оформление.
+      if (cause instanceof ApiError && cause.status >= 400 && cause.status < 500 && cause.status !== 401) {
+        const cleared = clearCheckoutKey(storageKey)
+        data.value = null
+        error.value = checkoutTexts.rejected
+        if (cleared) checkoutError.value = checkoutTexts.errors[cause.code ?? ''] ?? checkoutTexts.rejected
+      } else {
+        checkoutError.value = checkoutTexts.uncertain
+      }
+      return false
+    } finally {
+      if (version === revision) mutating.value = false
+    }
+  }
+
   // Синхронный сброс не оставляет данные предыдущего пользователя в интерфейсе.
-  watch(() => auth.isAuthenticated ? auth.accessToken : null, (token) => {
+  watch(() => auth.isAuthenticated ? `${auth.user!.id}:${auth.accessToken}` : null, (token) => {
     reset()
-    if (token) void loadCart()
+    if (token) {
+      try { pendingKey.value = sessionStorage.getItem(checkoutStorageKey()) }
+      catch { checkoutError.value = checkoutTexts.storageUnavailable }
+      void loadCart()
+    }
   }, { immediate: true, flush: 'sync' })
 
-  return { data, loading, mutating, error, notice, itemCount, loadCart, addItem, updateItem, removeItem }
+  return { data, loading, mutating, error, notice, itemCount, order, checkoutError, checkoutPending, loadCart, addItem, updateItem, removeItem, placeOrder }
 })

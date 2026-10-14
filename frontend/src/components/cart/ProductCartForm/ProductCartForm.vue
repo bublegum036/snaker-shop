@@ -19,7 +19,7 @@ const remaining = computed(() => {
   const stock = item?.stock ?? selectedSize.value?.stock ?? 0
   return Math.max(0, stock - (item?.quantity ?? 0))
 })
-const busy = computed(() => cart.loading || cart.mutating || auth.initializing)
+const busy = computed(() => cart.loading || cart.mutating || cart.checkoutPending || auth.initializing)
 const canAdd = computed(() => !busy.value && !!cart.data && !cart.error && (selectedSize.value?.stock ?? 0) > 0 && remaining.value > 0)
 
 watch([sizeId, () => auth.accessToken], () => {

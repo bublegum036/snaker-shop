@@ -8,7 +8,7 @@ const props = defineProps<{ item: CartItem }>()
 const cart = useCartStore()
 const quantity = ref<number | ''>(props.item.quantity)
 const error = ref('')
-const busy = computed(() => cart.loading || cart.mutating)
+const busy = computed(() => cart.loading || cart.mutating || cart.checkoutPending)
 
 watch(() => props.item.quantity, (value) => {
   quantity.value = value

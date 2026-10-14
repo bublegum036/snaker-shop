@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cartViewTexts as text } from './CartView.texts'
 import { RouterLink } from 'vue-router'
+import CheckoutPanel from '@/components/cart/CheckoutPanel/CheckoutPanel.vue'
 import CartLine from '@/components/cart/CartLine/CartLine.vue'
 import { useCartStore } from '@/stores/cart/cart.store'
 import { formatPrice } from '@/utils/format-price'
@@ -29,6 +30,7 @@ const cart = useCartStore()
       <p class="cart-total">{{ text.total }} <strong>{{ formatPrice(cart.data.estimated_total) }}</strong></p>
       <p class="hint-text">{{ text.availabilityHint }}</p>
     </template>
+    <CheckoutPanel />
     <RouterLink class="catalog-link" :to="{ name: 'catalog' }">{{ text.backToCatalog }}</RouterLink>
   </section>
 </template>
