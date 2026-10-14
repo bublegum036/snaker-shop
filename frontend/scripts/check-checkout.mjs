@@ -15,7 +15,7 @@ const flush = () => new Promise((resolve) => setImmediate(resolve))
 const credentials = { email: 'fixture@example.com', password: 'fixture-only' }
 const profile = { id: 9001, email: credentials.email, is_admin: false }
 const row = { id: 1, product_size_id: 302, product_id: 32, name: 'Fixture', size: '42.0', price: '5000.00', quantity: 1, stock: 3, subtotal: '5000.00' }
-const order = { id: 7001, user_id: profile.id, status: 'created', total: '4990.00', created_at: '2026-10-15T12:00:00Z', items: [{ id: 1, product_size_id: 302, quantity: 1, price_at_purchase: '4990.00' }] }
+const order = { id: 7001, user_id: profile.id, status: 'created', total: '4990.00', created_at: '2026-10-15T12:00:00Z', items: [{ id: 1, product_size_id: 302, quantity: 1, price_at_purchase: '4990.00', name_at_purchase: 'Original sneaker', size_at_purchase: '42.0' }] }
 let handler, pair, apiCart, keys, records, passed = 0, user = profile
 let rejectOrders, loseResponse, failRead
 const previousFetch = (url, init) => handler(String(url), init)

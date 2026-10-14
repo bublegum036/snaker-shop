@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useOrderDetails } from '@/composables/orders/useOrderDetails/useOrderDetails'
 import OrderSummary from '@/components/orders/OrderSummary/OrderSummary.vue'
-import { formatPrice } from '@/utils/format-price'
+import OrderItemLine from '@/components/orders/OrderItemLine/OrderItemLine.vue'
 import { orderDetailsViewTexts as text } from './OrderDetailsView.texts'
 
 const props = defineProps<{ orderId: string }>()
 const { order, loading, error, load } = useOrderDetails(() => props.orderId)
+const hasLegacyItems = computed(() => order.value?.items.some((item) => item.name_at_purchase == null || item.size_at_purchase == null))
 </script>
 
 <template>
@@ -23,14 +25,10 @@ const { order, loading, error, load } = useOrderDetails(() => props.orderId)
     <template v-else-if="order">
       <div class="summary"><OrderSummary :order="order" /></div>
       <h2>{{ text.items }}</h2>
+      <p v-if="hasLegacyItems" class="hint-text">{{ text.legacyItems }}</p>
       <ul>
         <li v-for="(item, index) in order.items" :key="item.id">
-          <h3>{{ text.position(index) }}</h3>
-          <dl>
-            <dt>{{ text.sizeCode }}</dt><dd>{{ item.product_size_id }}</dd>
-            <dt>{{ text.quantity }}</dt><dd>{{ item.quantity }}</dd>
-            <dt>{{ text.price }}</dt><dd>{{ formatPrice(item.price_at_purchase) }}</dd>
-          </dl>
+          <OrderItemLine :item="item" :index="index" />
         </li>
       </ul>
     </template>
@@ -45,13 +43,5 @@ h1 { margin: 0; font-size: clamp(36px, 5vw, 56px); letter-spacing: -2px; }
 .summary { margin-top: 32px; }
 ul { list-style: none; padding: 0; }
 li { padding: 20px 0; border-bottom: 1px solid var(--color-border); }
-h3 { margin-top: 0; }
-dl { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
-dt { color: var(--color-muted); }
-dd { margin: 0; }
 .back-link { display: inline-block; margin-top: 24px; text-decoration: underline; text-underline-offset: 3px; }
-@media (max-width: 480px) {
-  dl { grid-template-columns: 1fr; gap: 6px; }
-  dd { margin-bottom: 10px; }
-}
 </style>

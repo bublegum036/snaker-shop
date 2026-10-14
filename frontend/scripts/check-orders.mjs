@@ -12,7 +12,7 @@ const json = (body, status = 200) => new Response(JSON.stringify(body), { status
 const flush = () => new Promise((resolve) => setImmediate(resolve))
 const profile = { id: 9001, email: 'fixture@example.com', is_admin: false }
 const credentials = { email: profile.email, password: 'fixture-only' }
-const fixture = (id, userId = profile.id) => ({ id, user_id: userId, status: 'processing', total: '7990.00', created_at: '2026-10-15T12:00:00Z', items: [{ id: 1, product_size_id: 302, quantity: 1, price_at_purchase: '7990.00' }] })
+const fixture = (id, userId = profile.id) => ({ id, user_id: userId, status: 'processing', total: '7990.00', created_at: '2026-10-15T12:00:00Z', items: [{ id: 1, product_size_id: 302, quantity: 1, price_at_purchase: '7990.00', name_at_purchase: 'Original sneaker', size_at_purchase: '42.0' }] })
 let auth, handler, dataset, calls, user, scopes = [], passed = 0
 const mount = (factory) => { const scope = effectScope(); scopes.push(scope); return { scope, state: scope.run(factory) } }
 globalThis.fetch = (url, init) => handler(String(url), init)
@@ -102,6 +102,15 @@ try {
     await fresh(); const details = mount(() => useOrderDetails(() => '100')).state; await flush()
     assert.deepEqual(calls, ['/api/orders/100']); assert.equal(details.order.value.items[0].price_at_purchase, '7990.00')
     assert.equal(details.order.value.status, 'processing')
+    assert.equal(details.order.value.items[0].name_at_purchase, 'Original sneaker')
+    assert.equal(details.order.value.items[0].size_at_purchase, '42.0')
+  })
+  await check('legacy orders keep explicitly unknown snapshots', async () => {
+    await fresh(); dataset[0].items[0].name_at_purchase = null; dataset[0].items[0].size_at_purchase = null
+    const details = mount(() => useOrderDetails(() => '100')).state; await flush()
+    assert.equal(details.order.value.items[0].name_at_purchase, null)
+    assert.equal(details.order.value.items[0].size_at_purchase, null)
+    assert.deepEqual(calls, ['/api/orders/100'])
   })
   await check('missing or foreign order gets a neutral 404 message', async () => {
     await fresh(); const details = mount(() => useOrderDetails(() => '999')).state; await flush()

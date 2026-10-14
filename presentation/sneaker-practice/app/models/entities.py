@@ -71,12 +71,16 @@ class Order(Base):
 
 class OrderItem(Base):
     __tablename__ = 'order_items'
-    __table_args__ = (CheckConstraint('quantity > 0', name='ck_item_quantity'), CheckConstraint('price_at_purchase > 0', name='ck_item_price'))
+    __table_args__ = (CheckConstraint('quantity > 0', name='ck_item_quantity'), CheckConstraint('price_at_purchase > 0', name='ck_item_price'),
+        CheckConstraint('size_at_purchase > 0', name='ck_item_snapshot_size'),
+        CheckConstraint('(name_at_purchase IS NULL) = (size_at_purchase IS NULL)', name='ck_item_snapshot_pair'))
     id: Mapped[int] = mapped_column(Identity(), primary_key=True)
     order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'))
     product_size_id: Mapped[int] = mapped_column(ForeignKey('product_sizes.id'))
     quantity: Mapped[int] = mapped_column(Integer)
     price_at_purchase: Mapped[Decimal] = mapped_column(Numeric(10, 2))
+    name_at_purchase: Mapped[str | None] = mapped_column(Text, nullable=True)
+    size_at_purchase: Mapped[Decimal | None] = mapped_column(Numeric(4, 1), nullable=True)
 
     order: Mapped[Order] = relationship(back_populates="items")
     product_size: Mapped[ProductSize] = relationship()

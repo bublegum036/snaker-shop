@@ -3,6 +3,8 @@ export interface OrderItem {
   product_size_id: number
   quantity: number
   price_at_purchase: string
+  name_at_purchase: string | null
+  size_at_purchase: string | null
 }
 
 export interface Order {

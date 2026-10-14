@@ -42,7 +42,7 @@ def verify():
             config.attributes['connection'] = connection
             command.upgrade(config, 'head')
             command.check(config)
-            check('migration reaches 0002 and repeats safely', connection.scalar(text('SELECT version_num FROM alembic_version')) == '0002')
+            check('migration reaches 0003 and repeats safely', connection.scalar(text('SELECT version_num FROM alembic_version')) == '0003')
         checks.append('alembic check finds no pending model changes')
         inspector = inspect(engine)
         check('nine foreign keys exist', sum(len(inspector.get_foreign_keys(t)) for t in Base.metadata.tables) == 9)
@@ -103,7 +103,7 @@ def verify():
             check('seed advances identity beyond fixed IDs', new_id > 30)
             transaction.rollback()
         check('constraint fixtures rolled back', snapshot()['users'] == [] and snapshot()['orders'] == [])
-        report.update(checks=checks, database='new disposable database', revision='0002')
+        report.update(checks=checks, database='new disposable database', revision='0003')
     finally:
         if engine is not None:
             engine.dispose()

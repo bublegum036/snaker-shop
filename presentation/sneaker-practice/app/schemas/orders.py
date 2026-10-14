@@ -16,6 +16,8 @@ class OrderItemRead(BaseModel):
     product_size_id: int
     quantity: int
     price_at_purchase: Decimal
+    name_at_purchase: str | None = None
+    size_at_purchase: Decimal | None = None
 
 class OrderRead(BaseModel):
     id: int

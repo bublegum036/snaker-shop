@@ -35,7 +35,7 @@ def verify():
             return {t:[tuple(row) for row in db.execute(select(Base.metadata.tables[t]).order_by(Base.metadata.tables[t].c.id))] for t in Base.metadata.tables}
     with engine.connect() as db:
         check('migration created eight application tables',len(Base.metadata.tables)==8 and all(db.scalar(text('SELECT to_regclass(:name)'),{'name':name}) for name in Base.metadata.tables))
-        check('migration head is 0002',db.scalar(text('SELECT version_num FROM alembic_version'))=='0002')
+        check('migration head is 0003',db.scalar(text('SELECT version_num FROM alembic_version'))=='0003')
         check('seed counts are 2/3/4',tuple(db.execute(text('SELECT (SELECT count(*) FROM brands),(SELECT count(*) FROM products),(SELECT count(*) FROM product_sizes)')).one())==(2,3,4))
     before=snapshot()
     subprocess.run([sys.executable,'-m','app.seed'],cwd=ROOT,check=True,capture_output=True,timeout=20)

@@ -15,7 +15,8 @@ def verify():
 
     def snapshot():
         with engine.connect() as db:
-            return {name: [tuple(row) for row in db.execute(select(table).order_by(table.c.id))]
+            return {name: [tuple(row) for row in db.execute(select(*[column for column in table.c
+                        if column.name not in {'name_at_purchase', 'size_at_purchase'}]).order_by(table.c.id))]
                     for name, table in tables.items()}
 
     with engine.connect() as db:
@@ -32,7 +33,7 @@ def verify():
     assert snapshot() == before
     with engine.connect() as db:
         assert db.scalar(text('SELECT count(*) FROM checkout_requests')) == 0
-        assert db.scalar(text('SELECT version_num FROM alembic_version')) == '0002'
+        assert db.scalar(text('SELECT version_num FROM alembic_version')) == '0003'
     command.downgrade(config, '0001')
     assert snapshot() == before
     command.upgrade(config, 'head')
@@ -43,7 +44,7 @@ def verify():
         for table in ['cart_items', 'order_items', 'orders', 'users']:
             db.execute(text(f'DELETE FROM {table} WHERE id=501'))
     engine.dispose()
-    print('PASS migration preserves all seven shop tables through upgrade, downgrade and upgrade')
+    print('PASS migrations preserve original columns in all seven shop tables through upgrade, downgrade and upgrade')
 
 
 if __name__ == '__main__':

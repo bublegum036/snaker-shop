@@ -36,11 +36,13 @@ def checkout(user_id, *, idempotency_key=None, sessions=None, _test_hook=None):
                 raise ShopError(409, 'size_unavailable')
             sizes[size.id] = size
         prices = {}
+        names = {}
         for product_id in sorted({size.product_id for size in sizes.values()}):
             product = db.scalar(select(Product).where(Product.id == product_id).with_for_update(read=True))
             if product is None:
                 raise ShopError(409, 'product_unavailable')
             prices[product_id] = product.price
+            names[product_id] = product.name
         for item in cart:
             if item.quantity <= 0 or item.quantity > sizes[item.product_size_id].stock:
                 raise ShopError(409, 'insufficient_stock')
@@ -54,7 +56,8 @@ def checkout(user_id, *, idempotency_key=None, sessions=None, _test_hook=None):
         for index, item in enumerate(cart):
             size = sizes[item.product_size_id]
             db.add(OrderItem(order_id=order.id, product_size_id=size.id,
-                quantity=item.quantity, price_at_purchase=prices[size.product_id]))
+                quantity=item.quantity, price_at_purchase=prices[size.product_id],
+                name_at_purchase=names[size.product_id], size_at_purchase=size.size))
             size.stock -= item.quantity
             db.flush()
             if index == 0:

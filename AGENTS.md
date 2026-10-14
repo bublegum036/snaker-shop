@@ -66,7 +66,7 @@ logic in `app/services/`, and persistence definitions in `app/models/`.
 Use Alembic migrations for schema changes. Follow existing synchronous session
 and transaction patterns, especially `app/services/unit_of_work.py`.
 Preserve atomic checkout, consistent locking, stock validation, price snapshots,
-personal order access, and admin authorization when changing related behavior.
+purchase-time name/size snapshots, personal order access, and admin authorization when changing related behavior.
 
 ## Verification
 
@@ -120,7 +120,8 @@ Group each Pinia store with its texts in `stores/<domain>/`, for example
 Update direct imports and isolated SSR check paths when moving stores.
 
 Keep local `.env` values, passwords, and JWTs out of source and tool output.
-Preserve existing local configuration. Seed is additive and does not reset
+Preserve existing local configuration. Leave unknown legacy order snapshots null;
+do not backfill them from the current catalog or rewrite cached checkout responses. Seed is additive and does not reset
 prices or inventory. Keep the working database volume; ordinary shutdown uses
 `docker compose stop db`, not volume removal.
 

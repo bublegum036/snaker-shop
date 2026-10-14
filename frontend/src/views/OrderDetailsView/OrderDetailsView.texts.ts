@@ -4,9 +4,6 @@ export const orderDetailsViewTexts = {
   loading: 'Загружаем заказ…',
   retry: 'Повторить загрузку',
   items: 'Позиции заказа',
-  position: (index: number) => `Позиция ${index + 1}`,
-  sizeCode: 'Код размера',
-  quantity: 'Количество',
-  price: 'Цена за пару при покупке',
+  legacyItems: 'Для некоторых позиций название и размер на момент покупки не сохранены.',
   back: '← Вернуться к истории заказов',
 } as const
