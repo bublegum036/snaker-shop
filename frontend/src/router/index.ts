@@ -8,6 +8,8 @@ import OrdersView from '@/views/OrdersView/OrdersView.vue'
 import OrderDetailsView from '@/views/OrderDetailsView/OrderDetailsView.vue'
 import AdminProductsView from '@/views/AdminProductsView/AdminProductsView.vue'
 import AdminInventoryView from '@/views/AdminInventoryView/AdminInventoryView.vue'
+import AdminOrdersView from '@/views/AdminOrdersView/AdminOrdersView.vue'
+import AdminOrderDetailsView from '@/views/AdminOrderDetailsView/AdminOrderDetailsView.vue'
 import { sessionGuard } from './session-guard'
 
 const router = createRouter({
@@ -16,6 +18,8 @@ const router = createRouter({
     { path: '/', name: 'catalog', component: CatalogView },
     { path: '/login', name: 'login', component: AuthView, props: { mode: 'login' }, meta: { guestOnly: true } },
     { path: '/register', name: 'register', component: AuthView, props: { mode: 'register' }, meta: { guestOnly: true } },
+    { path: '/admin/orders', name: 'admin-orders', component: AdminOrdersView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: '/admin/orders/:orderId', name: 'admin-order-details', component: AdminOrderDetailsView, props: (route) => ({ orderId: String(route.params.orderId) }), meta: { requiresAuth: true, requiresAdmin: true } },
     { path: '/admin/products/:productId/inventory', name: 'admin-inventory', component: AdminInventoryView, props: (route) => ({ productId: String(route.params.productId) }), meta: { requiresAuth: true, requiresAdmin: true } },
     { path: '/admin/products', name: 'admin-products', component: AdminProductsView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: '/account', name: 'account', component: AccountView, meta: { requiresAuth: true } },

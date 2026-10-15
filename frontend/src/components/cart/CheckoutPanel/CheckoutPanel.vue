@@ -1,23 +1,45 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
+import ConfirmDialog from '@/components/common/ConfirmDialog/ConfirmDialog.vue'
 import { useCartStore } from '@/stores/cart/cart.store'
 import { formatPrice } from '@/utils/format-price'
 import { checkoutPanelTexts as text } from './CheckoutPanel.texts'
 
 const cart = useCartStore()
+const confirming = ref(false)
+const submitting = ref(false)
+const confirmationTotal = ref('')
 const canSubmit = computed(() => !cart.loading && !cart.mutating && (
   cart.checkoutPending || (!!cart.data?.items.length && !cart.error)
 ))
+
+async function requestCheckout() {
+  if (!canSubmit.value) return
+  if (cart.checkoutPending) await submitOrder()
+  else { confirmationTotal.value = formatPrice(cart.data!.estimated_total); confirming.value = true }
+}
+function cancelCheckout() { if (!cart.mutating) confirming.value = false }
+async function submitOrder() {
+  submitting.value = true
+  try { await cart.placeOrder() }
+  finally { submitting.value = false; confirming.value = false }
+}
+async function confirmCheckout() {
+  if (confirming.value && canSubmit.value) await submitOrder()
+}
+watch(() => cart.data, (data) => { if (!data && !cart.mutating) confirming.value = false })
 </script>
 
 <template>
   <div class="checkout-panel">
     <p v-if="cart.checkoutPending" class="hint-text" role="status">{{ text.pending }}</p>
     <p v-if="cart.checkoutError" class="error-text" role="alert">{{ cart.checkoutError }}</p>
-    <button type="button" class="primary-button" :disabled="!canSubmit" @click="cart.placeOrder()">
-      {{ cart.mutating ? text.busy : cart.checkoutPending ? text.repeat : text.submit }}
+    <button type="button" class="primary-button" :disabled="!canSubmit" @click="requestCheckout">
+      {{ submitting ? text.busy : cart.checkoutPending ? text.repeat : text.submit }}
     </button>
+    <ConfirmDialog v-if="confirming" :title="text.confirmTitle" :message="text.confirmMessage(confirmationTotal)"
+      :confirm-text="text.submit" :pending-text="text.busy" :busy="cart.mutating" :confirm-disabled="!canSubmit" @confirm="confirmCheckout" @cancel="cancelCheckout" />
     <section v-if="cart.order" class="order-result" role="status">
       <h2>{{ text.result(cart.order.id) }}</h2>
       <dl>

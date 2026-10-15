@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { sessionMessagesTexts as text } from './SessionMessages.texts'
+import { useSessionActions } from '@/composables/auth/useSessionActions/useSessionActions'
 import { useAuthStore } from '@/stores/auth/auth.store'
 
 const auth = useAuthStore()
+const { logout } = useSessionActions()
 </script>
 
 <template>
@@ -12,7 +14,7 @@ const auth = useAuthStore()
     <button type="button" class="secondary-button" :disabled="auth.initializing" @click="auth.restoreSession()">
       {{ text.retry }}
     </button>
-    <button type="button" class="text-button" @click="auth.logout()">{{ text.logout }}</button>
+    <button type="button" class="text-button" @click="logout">{{ text.logout }}</button>
   </div>
 </template>
 

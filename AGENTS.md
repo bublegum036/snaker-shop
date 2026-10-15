@@ -96,11 +96,15 @@ Node.js (the working local version is 22.12). For authentication changes,
 also run `npm run check:auth`; these isolated checks do not touch real accounts.
 For cart changes, also run `npm run check:cart`; for checkout changes run
 `npm run check:checkout` too; for order-history changes run `npm run check:orders`.
+For admin-order changes run `npm run check:admin-orders`; backend admin-order
+changes also require the disposable `verify_admin_orders.py` or full verifier.
 For admin-product changes run `npm run check:admin-products`; for inventory
 changes run `npm run check:admin-inventory`. Preserve role guards,
 confirmation before deletion and explicit reconciliation after uncertain writes.
 Use the shared ConfirmDialog for confirmations without changing page flow.
-Admin successes use the shared notifications store/host and expire after 3000ms.
+Explicit action successes across account, cart and admin flows use the shared
+notifications store/host and expire after 3000ms. Keep persistent errors and
+checkout receipts as page content; background reads should not emit success toasts.
 Run `npm run check:notifications` when changing notifications or their timers. Preserve pending checkout keys across retries and
 reloads, scope them to the user, and block cart mutations until the result is known.
 Preserve server totals,
@@ -140,3 +144,8 @@ Do not regenerate PDFs, reports, or the archive manifest for unrelated edits.
 For inventory writes, reuse ProductSize fields, allow stock 0, and send only
 changed PATCH fields. Editing size alone must not resubmit a stale stock value.
 Preserve server restrictions on referenced variant rename/deletion.
+
+Keep personal order reads scoped to the owner even for administrators. Use
+separate admin order read routes with role checks in both HTTP and transaction.
+Status changes require confirmation, allow only the next transition, and must
+not alter stock, order item snapshots or saved checkout responses.

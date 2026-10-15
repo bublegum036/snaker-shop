@@ -207,9 +207,9 @@ def verify():
         check('real logs use route templates', by_id[responses[1].headers['x-request-id']]['path'] == '/products/{product_id}')
         check('real server output omits raw URL tokens body and unknown paths', all(
             marker not in content for marker in ['live-query-secret', 'live-token-secret', 'live-body-secret', 'live-path-secret']))
-        check('OpenAPI operation count remains 21', sum(
+        check('OpenAPI operation count is 23', sum(
             method in {'get', 'post', 'put', 'patch', 'delete'}
-            for methods in responses[-1].json()['paths'].values() for method in methods) == 21)
+            for methods in responses[-1].json()['paths'].values() for method in methods) == 23)
     (ROOT / 'logging-verification.json').write_text(json.dumps({'checks': checks}, ensure_ascii=False, indent=2) + '\n')
     print('Verified', len(checks), 'HTTP diagnostic checks; safe errors and real server logs passed.')
 

@@ -95,11 +95,7 @@ def get_order(user_id, order_id, *, sessions=None):
 def change_status(admin_id, order_id, status, *, sessions=None):
     with transaction(sessions=sessions) as db:
         # Recheck the role in the writing transaction; keep it stable until commit.
-        admin = db.scalar(select(User).where(User.id == admin_id).with_for_update(read=True))
-        if admin is None:
-            raise ShopError(401, 'unknown_user')
-        if not admin.is_admin:
-            raise ShopError(403, 'admin_required')
+        require_order_admin(db, admin_id)
         order = db.scalar(select(Order).where(Order.id == order_id).with_for_update())
         if order is None:
             raise ShopError(404, 'order_not_found')
@@ -110,3 +106,29 @@ def change_status(admin_id, order_id, status, *, sessions=None):
         db.flush()
         result = dto(order)
     return result
+
+
+def require_order_admin(db, admin_id):
+    admin = db.scalar(select(User).where(User.id == admin_id).with_for_update(read=True))
+    if admin is None:
+        raise ShopError(401, 'unknown_user')
+    if not admin.is_admin:
+        raise ShopError(403, 'admin_required')
+
+
+def list_admin_orders(admin_id, *, limit=20, offset=0, status=None, sessions=None):
+    with transaction(sessions=sessions) as db:
+        require_order_admin(db, admin_id)
+        query = select(Order).options(selectinload(Order.items)).order_by(Order.id.desc())
+        if status is not None:
+            query = query.where(Order.status == status)
+        return [dto(order) for order in db.scalars(query.limit(limit).offset(offset))]
+
+
+def get_admin_order(admin_id, order_id, *, sessions=None):
+    with transaction(sessions=sessions) as db:
+        require_order_admin(db, admin_id)
+        order = db.scalar(select(Order).where(Order.id == order_id).options(selectinload(Order.items)))
+        if order is None:
+            raise ShopError(404, 'order_not_found')
+        return dto(order)

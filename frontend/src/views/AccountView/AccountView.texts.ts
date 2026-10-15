@@ -9,5 +9,6 @@ export const accountViewTexts = {
   customer: 'Покупатель',
   loading: 'Обновляем…',
   refresh: 'Обновить профиль',
+  refreshed: 'Профиль обновлён.',
   refreshFailed: 'Не удалось обновить профиль.',
 } as const

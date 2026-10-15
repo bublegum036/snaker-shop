@@ -10,12 +10,12 @@ window.SNEAKER_FINAL = {
     {
       "stage": "new venv",
       "passed": true,
-      "seconds": 1.03
+      "seconds": 1.05
     },
     {
       "stage": "install pinned requirements",
       "passed": true,
-      "seconds": 7.55
+      "seconds": 2.54
     },
     {
       "stage": "pip check",
@@ -30,7 +30,7 @@ window.SNEAKER_FINAL = {
     {
       "stage": "migrate base schema",
       "passed": true,
-      "seconds": 3.34
+      "seconds": 3.31
     },
     {
       "stage": "verify migrations preserve data",
@@ -40,37 +40,42 @@ window.SNEAKER_FINAL = {
     {
       "stage": "order name and size snapshots",
       "passed": true,
-      "seconds": 2.65
+      "seconds": 2.53
+    },
+    {
+      "stage": "admin order reads and transitions",
+      "passed": true,
+      "seconds": 1.5
     },
     {
       "stage": "seed catalog",
       "passed": true,
-      "seconds": 0.19
+      "seconds": 0.2
     },
     {
       "stage": "safe HTTP diagnostics",
       "passed": true,
-      "seconds": 0.98
+      "seconds": 1.07
     },
     {
       "stage": "final API acceptance",
       "passed": true,
-      "seconds": 5.42
+      "seconds": 5.5
     },
     {
       "stage": "schema and seed regression",
       "passed": true,
-      "seconds": 0.38
+      "seconds": 0.42
     },
     {
       "stage": "M2-M3 regression",
       "passed": true,
-      "seconds": 4.09
+      "seconds": 3.97
     },
     {
       "stage": "M4-M5 regression",
       "passed": true,
-      "seconds": 6.83
+      "seconds": 6.92
     }
   ],
   "checks": [
@@ -80,7 +85,7 @@ window.SNEAKER_FINAL = {
     "second seed leaves all data unchanged",
     "final health probes database",
     "docs HTML served",
-    "all 21 operations match extended API map",
+    "all 23 operations match extended API map",
     "protected checkout advertises Bearer security",
     "anya register",
     "anya login",
@@ -116,6 +121,8 @@ window.SNEAKER_FINAL = {
     "own history and detail",
     "foreign_order status and no writes",
     "status_forbidden status and no writes",
+    "admin order list available",
+    "admin foreign order details available",
     "admin status operation",
     "inventory: all writes advertise Bearer security",
     "inventory: new product has no sizes",
@@ -209,7 +216,7 @@ window.SNEAKER_FINAL = {
     "idempotency: different keys compete for one cart",
     "idempotency: successful responses remain replayable after races"
   ],
-  "operation_count": 21,
+  "operation_count": 23,
   "operations": {
     "catalog": [
       {
@@ -299,6 +306,16 @@ window.SNEAKER_FINAL = {
       {
         "method": "PATCH",
         "path": "/orders/{order_id}/status"
+      }
+    ],
+    "admin_orders": [
+      {
+        "method": "GET",
+        "path": "/admin/orders"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/orders/{order_id}"
       }
     ],
     "health": [
@@ -443,14 +460,15 @@ window.SNEAKER_FINAL = {
       "real logs correlate with headers and status codes",
       "real logs use route templates",
       "real server output omits raw URL tokens body and unknown paths",
-      "OpenAPI operation count remains 21"
+      "OpenAPI operation count is 23"
     ]
   },
   "regression": {
     "schema": 25,
     "m23": 85,
     "m45": 76,
-    "order_snapshots": 18
+    "order_snapshots": 18,
+    "admin_orders": 27
   },
   "cleanup": "temporary directory and databases removed; working volume preserved"
 };

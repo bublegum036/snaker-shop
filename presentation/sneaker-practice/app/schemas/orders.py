@@ -3,12 +3,14 @@ from decimal import Decimal
 from typing import Literal
 from pydantic import BaseModel, ConfigDict
 
+OrderStatus = Literal['created', 'processing', 'completed']
+
 class CheckoutRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
 class StatusUpdate(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    status: Literal['created', 'processing', 'completed']
+    status: OrderStatus
 
 class OrderItemRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)

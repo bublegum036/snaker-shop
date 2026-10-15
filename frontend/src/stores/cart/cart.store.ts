@@ -2,6 +2,7 @@ import { cartStoreTexts as text } from './cart.store.texts'
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { addCartItem, getCart, removeCartItem, updateCartItem, type Cart } from '@/api/cart.api'
+import { useNotificationsStore } from '@/stores/notifications/notifications.store'
 import { ApiError } from '@/api/http.client'
 import { useAuthStore } from '@/stores/auth/auth.store'
 
@@ -29,11 +30,11 @@ function getMutationErrorMessage(cause: unknown, action: CartAction): string {
 
 export const useCartStore = defineStore('cart', () => {
   const auth = useAuthStore()
+  const notifications = useNotificationsStore()
   const data = ref<Cart | null>(null)
   const loading = ref(false)
   const mutating = ref(false)
   const error = ref('')
-  const notice = ref('')
   const order = ref<Order | null>(null)
   const checkoutError = ref('')
   const pendingKey = ref<string | null>(null)
@@ -52,7 +53,6 @@ export const useCartStore = defineStore('cart', () => {
     checkoutError.value = ''
     pendingKey.value = null
     error.value = ''
-    notice.value = ''
     loading.value = false
     mutating.value = false
   }
@@ -66,7 +66,6 @@ export const useCartStore = defineStore('cart', () => {
     loading.value = true
     data.value = null
     error.value = ''
-    notice.value = ''
     try {
       const result = await getCart(auth.authorizedRequest, request.signal)
       if (version === revision && !request.signal.aborted) data.value = result
@@ -82,7 +81,6 @@ export const useCartStore = defineStore('cart', () => {
   async function mutateCart(action: CartAction, write: (signal: AbortSignal) => Promise<unknown>): Promise<boolean> {
     if (!auth.isAuthenticated) throw new Error(text.loginRequired)
     if (mutating.value || loading.value || checkoutPending.value || !data.value || error.value) return false
-    notice.value = ''
     readRequest?.abort()
     const request = new AbortController()
     writeRequest = request
@@ -96,7 +94,6 @@ export const useCartStore = defineStore('cart', () => {
         const result = await getCart(auth.authorizedRequest, request.signal)
         if (version === revision && !request.signal.aborted) {
           data.value = result
-          notice.value = text.confirmed(action)
         }
       } catch {
         if (version === revision && !request.signal.aborted) {
@@ -104,6 +101,7 @@ export const useCartStore = defineStore('cart', () => {
           error.value = text.refreshAfterWriteFailed(action)
         }
       }
+      if (version === revision && !request.signal.aborted) notifications.success(text.confirmed(action))
       return version === revision && !request.signal.aborted
     } catch (cause) {
       if (version !== revision || request.signal.aborted) return false
@@ -171,7 +169,6 @@ export const useCartStore = defineStore('cart', () => {
     writeRequest = request
     const version = revision
     mutating.value = true
-    notice.value = ''
     order.value = null
     try {
       const result = await checkoutRequest(auth.authorizedRequest, key, request.signal)
@@ -187,6 +184,7 @@ export const useCartStore = defineStore('cart', () => {
       } catch {
         if (version === revision && !request.signal.aborted) error.value = checkoutTexts.refreshFailed
       }
+      if (version === revision && !request.signal.aborted) notifications.success(checkoutTexts.confirmed(result.id))
       return version === revision && !request.signal.aborted
     } catch (cause) {
       if (version !== revision || request.signal.aborted) return false
@@ -215,5 +213,5 @@ export const useCartStore = defineStore('cart', () => {
     }
   }, { immediate: true, flush: 'sync' })
 
-  return { data, loading, mutating, error, notice, itemCount, order, checkoutError, checkoutPending, loadCart, addItem, updateItem, removeItem, placeOrder }
+  return { data, loading, mutating, error, itemCount, order, checkoutError, checkoutPending, loadCart, addItem, updateItem, removeItem, placeOrder }
 })

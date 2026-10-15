@@ -1,4 +1,6 @@
 export const checkoutPanelTexts = {
+  confirmTitle: 'Оформление заказа',
+  confirmMessage: (total: string) => `Оформить заказ из корзины? Предварительная сумма: ${total}. Сервер проверит актуальные цены и наличие.`,
   submit: 'Оформить заказ',
   repeat: 'Уточнить результат оформления',
   busy: 'Оформляем заказ…',

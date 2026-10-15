@@ -4,6 +4,7 @@ export const appHeaderTexts = {
   trademark: '®',
   navigation: 'Основная навигация',
   catalog: 'Каталог',
+  adminOrders: 'Заказы магазина',
   adminProducts: 'Управление товарами',
   orders: 'Заказы',
   checking: 'Проверяем вход…',

@@ -9,8 +9,6 @@ export const productCartFormTexts = {
   adding: 'Добавляем…',
   add: 'В корзину',
   signIn: 'Войдите, чтобы добавить товар',
-  openCart: 'Открыть корзину',
-  added: 'Товар добавлен в корзину.',
   invalidQuantity: 'Укажите целое количество в пределах доступного остатка.',
   addFailed: 'Не удалось добавить товар.',
   addLabel: (name: string) => `Добавление ${name} в корзину`,

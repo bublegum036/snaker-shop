@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cartItemActionsTexts as text } from './CartItemActions.texts'
 import { computed, ref, watch } from 'vue'
+import ConfirmDialog from '@/components/common/ConfirmDialog/ConfirmDialog.vue'
 import type { CartItem } from '@/api/cart.api'
 import { useCartStore } from '@/stores/cart/cart.store'
 
@@ -8,6 +9,7 @@ const props = defineProps<{ item: CartItem }>()
 const cart = useCartStore()
 const quantity = ref<number | ''>(props.item.quantity)
 const error = ref('')
+const confirming = ref(false)
 const busy = computed(() => cart.loading || cart.mutating || cart.checkoutPending)
 
 watch(() => props.item.quantity, (value) => {
@@ -26,10 +28,16 @@ async function save() {
   catch { /* Серверная ошибка показана страницей через cart.error. */ }
 }
 
+function requestRemove() { if (!busy.value) confirming.value = true }
+function cancelRemove() { if (!cart.mutating) confirming.value = false }
+
+watch(() => cart.data, (data) => { if (!data && !cart.mutating) confirming.value = false })
+
 async function remove() {
-  if (busy.value) return
+  if (busy.value || !confirming.value) return
   try { await cart.removeItem(props.item.id) }
   catch { /* Серверная ошибка показана страницей через cart.error. */ }
+  finally { confirming.value = false }
 }
 </script>
 
@@ -41,7 +49,9 @@ async function remove() {
       </label>
       <button type="submit" class="secondary-button" :disabled="busy || item.stock === 0 || quantity === item.quantity">{{ text.save }}</button>
     </form>
-    <button type="button" class="text-button remove-button" :disabled="busy" :aria-label="text.removeLabel(item.name, item.size)" @click="remove">{{ text.remove }}</button>
+    <button type="button" class="text-button remove-button" :disabled="busy" :aria-label="text.removeLabel(item.name, item.size)" @click="requestRemove">{{ text.remove }}</button>
+    <ConfirmDialog v-if="confirming" :title="text.confirmTitle" :message="text.confirmMessage(item.name, item.size)" :confirm-text="text.remove"
+      :busy="cart.mutating" :confirm-disabled="busy" destructive @confirm="remove" @cancel="cancelRemove" />
     <p v-if="error" class="error-text" role="alert">{{ error }}</p>
   </div>
 </template>

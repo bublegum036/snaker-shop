@@ -18,6 +18,7 @@ EXPECTED={
  'auth': [('POST','/auth/register'),('POST','/auth/login'),('GET','/auth/me')],
  'cart': [('GET','/cart'),('POST','/cart/items'),('PATCH','/cart/items/{item_id}'),('DELETE','/cart/items/{item_id}')],
  'orders': [('POST','/orders'),('GET','/orders'),('GET','/orders/{order_id}'),('PATCH','/orders/{order_id}/status')],
+ 'admin_orders': [('GET','/admin/orders'),('GET','/admin/orders/{order_id}')],
  'health': [('GET','/health')]
 }
 
@@ -47,7 +48,7 @@ def verify():
         methods={'get','post','put','patch','delete'}
         actual={(method.upper(),path) for path,ops in spec['paths'].items() for method in ops if method in methods}
         expected={x for values in EXPECTED.values() for x in values}
-        check('all 21 operations match extended API map',actual==expected)
+        check('all 23 operations match extended API map',actual==expected)
         check('protected checkout advertises Bearer security',bool(spec['paths']['/orders']['post'].get('security')))
         def registration(person):
             credentials={'email':person+'@example.com','password':'Study-only-'+person+'!'}
@@ -100,6 +101,8 @@ def verify():
         check('own history and detail',client.get('/orders',headers=anya).json()[0]['id']==oid and client.get(f'/orders/{oid}',headers=anya).status_code==200)
         rejection('foreign_order','GET',f'/orders/{oid}',boris,None,404)
         rejection('status_forbidden','PATCH',f'/orders/{oid}/status',anya,{'status':'processing'},403)
+        check('admin order list available',client.get('/admin/orders',headers=admin).status_code==200)
+        check('admin foreign order details available',client.get(f'/admin/orders/{oid}',headers=admin).json()['id']==oid)
         r=client.patch(f'/orders/{oid}/status',headers=admin,json={'status':'processing'});check('admin status operation',r.status_code==200 and r.json()['status']=='processing')
         journey.append({'step':'История','status':200,'result':'Свой заказ виден; чужой ID возвращает 404'})
         checks.extend(verify_inventory(client,admin,anya,boris,engine))

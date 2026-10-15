@@ -11,7 +11,6 @@ const auth = useAuthStore()
 const cart = useCartStore()
 const sizeId = ref<number | null>(null)
 const quantity = ref<number | ''>(1)
-const message = ref('')
 const error = ref('')
 const selectedSize = computed(() => props.product.sizes.find((size) => size.id === sizeId.value))
 const remaining = computed(() => {
@@ -24,7 +23,6 @@ const canAdd = computed(() => !busy.value && !!cart.data && !cart.error && (sele
 
 watch([sizeId, () => auth.accessToken], () => {
   quantity.value = 1
-  message.value = ''
   error.value = ''
 })
 watch(() => cart.data, (data) => {
@@ -34,15 +32,14 @@ watch(() => cart.data, (data) => {
 async function add() {
   if (!canAdd.value || sizeId.value === null) return
   error.value = ''
-  message.value = ''
   if (typeof quantity.value !== 'number' || !Number.isInteger(quantity.value) || quantity.value < 1 || quantity.value > remaining.value) {
     error.value = text.invalidQuantity
     return
   }
   try {
     if (await cart.addItem(sizeId.value, quantity.value)) {
+      sizeId.value = null
       quantity.value = 1
-      message.value = text.added
     }
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : text.addFailed
@@ -52,32 +49,32 @@ async function add() {
 
 <template>
   <form class="product-cart-form" :aria-label="text.addLabel(product.name)" @submit.prevent="add">
-    <fieldset v-if="product.sizes.length" :disabled="busy">
-      <legend>{{ text.size }}</legend>
-      <div class="size-options">
-        <label v-for="size in product.sizes" :key="size.id" :class="{ unavailable: size.stock === 0 }">
-          <input v-model="sizeId" type="radio" :name="`size-${product.id}`" :value="size.id" :disabled="size.stock === 0">
-          <span>{{ Number(size.size) }}{{ size.stock === 0 ? text.unavailableSize : '' }}</span>
-        </label>
-      </div>
-    </fieldset>
+    <div v-if="product.sizes.length" class="product-options">
+      <fieldset :disabled="busy">
+        <legend>{{ text.size }}</legend>
+        <div class="size-options">
+          <label v-for="size in product.sizes" :key="size.id" :class="{ unavailable: size.stock === 0 }">
+            <input v-model="sizeId" type="radio" :name="`size-${product.id}`" :value="size.id" :disabled="size.stock === 0">
+            <span>{{ Number(size.size) }}{{ size.stock === 0 ? text.unavailableSize : '' }}</span>
+          </label>
+        </div>
+      </fieldset>
+      <label v-if="auth.isAuthenticated" class="quantity-field">{{ text.quantity }}
+        <input v-model="quantity" type="number" min="1" :max="remaining" step="1" required
+          :disabled="busy || !selectedSize || !cart.data || remaining === 0">
+      </label>
+    </div>
     <p v-else class="hint-text">{{ text.noSizes }}</p>
     <template v-if="auth.isAuthenticated">
+      <p v-if="product.sizes.length" class="hint-text availability-hint" role="status">
+        {{ cart.loading ? text.checking : selectedSize && cart.data ? text.remaining(remaining) : text.chooseSize }}
+      </p>
       <p v-if="cart.error" class="error-text" role="alert">{{ cart.error }}</p>
       <button v-if="!cart.data && !busy" type="button" class="text-button" @click="cart.loadCart()">{{ text.refresh }}</button>
-      <p v-if="cart.loading" class="hint-text" role="status">{{ text.checking }}</p>
-      <template v-if="selectedSize && cart.data">
-        <p class="hint-text">{{ text.remaining(remaining) }}</p>
-        <label class="quantity-field">{{ text.quantity }}
-          <input v-model="quantity" type="number" min="1" :max="remaining" step="1" required :disabled="busy || remaining === 0">
-        </label>
-      </template>
-      <p v-else-if="!sizeId && product.sizes.length" class="hint-text">{{ text.chooseSize }}</p>
       <button type="submit" class="primary-button" :disabled="!canAdd">{{ cart.mutating ? text.adding : text.add }}</button>
     </template>
     <RouterLink v-else-if="!auth.initializing" class="login-link" :to="{ name: 'login', query: { next: 'catalog' } }">{{ text.signIn }}</RouterLink>
     <p v-if="error && error !== cart.error" class="error-text" role="alert">{{ error }}</p>
-    <p v-if="message" class="hint-text" role="status">{{ message }} <RouterLink :to="{ name: 'cart' }">{{ text.openCart }}</RouterLink></p>
   </form>
 </template>
 
@@ -87,9 +84,18 @@ async function add() {
   font-size: 13px;
 }
 
+.product-options {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
 fieldset {
+  flex: 1 1 140px;
   border: 0;
-  margin: 0 0 14px;
+  margin: 0;
   padding: 0;
   min-width: 0;
 }
@@ -131,14 +137,24 @@ legend {
 
 .quantity-field {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+  flex: 0 0 90px;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+  color: var(--color-muted);
 }
 
 .quantity-field input {
-  width: 80px;
-  padding: 8px;
+  width: 100%;
+  min-height: 36px;
+  padding: 7px;
+  color: var(--color-text);
+}
+
+.availability-hint {
+  min-height: 1.5em;
+  line-height: 1.5;
+  margin: 0 0 14px;
 }
 
 .primary-button {

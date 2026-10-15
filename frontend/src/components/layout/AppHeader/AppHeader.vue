@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { appHeaderTexts as text } from './AppHeader.texts'
 import { RouterLink } from 'vue-router'
+import { useSessionActions } from '@/composables/auth/useSessionActions/useSessionActions'
 import { useAuthStore } from '@/stores/auth/auth.store'
 import CartLink from '@/components/cart/CartLink/CartLink.vue'
 
 const auth = useAuthStore()
+const { logout } = useSessionActions()
 </script>
 
 <template>
@@ -15,10 +17,11 @@ const auth = useAuthStore()
       <span v-if="auth.initializing" class="hint-text" role="status">{{ text.checking }}</span>
       <template v-else-if="auth.isAuthenticated">
         <RouterLink v-if="auth.user?.is_admin" :to="{ name: 'admin-products' }">{{ text.adminProducts }}</RouterLink>
+        <RouterLink v-if="auth.user?.is_admin" :to="{ name: 'admin-orders' }">{{ text.adminOrders }}</RouterLink>
         <CartLink />
         <RouterLink :to="{ name: 'orders' }">{{ text.orders }}</RouterLink>
         <RouterLink class="account-link" :to="{ name: 'account' }">{{ auth.user?.email }}</RouterLink>
-        <button type="button" class="text-button" @click="auth.logout()">{{ text.logout }}</button>
+        <button type="button" class="text-button" @click="logout">{{ text.logout }}</button>
       </template>
       <template v-else>
         <RouterLink :to="{ name: 'login' }">{{ text.login }}</RouterLink>

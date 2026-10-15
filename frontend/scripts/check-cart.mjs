@@ -19,6 +19,7 @@ globalThis.fetch = (url, init) => handler(String(url), init)
 
 try {
   const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth/auth.store.ts')
+  const { useNotificationsStore } = await server.ssrLoadModule('/src/stores/notifications/notifications.store.ts')
   const { useCartStore } = await server.ssrLoadModule('/src/stores/cart/cart.store.ts')
   function defaultHandler(url, init) {
     if (url === '/api/auth/login') return Promise.resolve(json({ access_token: 'fixture-not-a-jwt', token_type: 'bearer' }))
@@ -59,6 +60,7 @@ try {
     return Promise.resolve(json(item))
   }
   function fresh() {
+    previous?.notifications.$dispose()
     previous?.cart.$dispose()
     previous?.auth.$dispose()
     setActivePinia(createPinia())
@@ -68,7 +70,7 @@ try {
     patches = 0
     deletes = 0
     lastBody = undefined
-    previous = { auth: useAuthStore(), cart: useCartStore() }
+    previous = { auth: useAuthStore(), cart: useCartStore(), notifications: useNotificationsStore() }
     return previous
   }
   async function signedIn() {
@@ -100,6 +102,7 @@ try {
     const { cart } = await signedIn()
     assert.equal(await cart.addItem(302, 1), true)
     assert.deepEqual(lastBody, { product_size_id: 302, quantity: 1 })
+    assert.match(previous.notifications.current.message, /Товар добавлен/)
     assert.equal(await cart.addItem(302, 1), true)
     assert.equal(cart.data.items.length, 1)
     assert.equal(cart.itemCount, 2)
@@ -233,7 +236,7 @@ try {
     await cart.updateItem(row.id, 1)
     assert.equal(cart.itemCount, 1)
     assert.equal(cart.data.estimated_total, '5000.00')
-    assert.match(cart.notice, /Количество обновлено/)
+    assert.match((previous.notifications.current?.message ?? ''), /Количество обновлено/)
   })
 
   await check('DELETE accepts empty 204 and refreshes total and badge', async () => {
@@ -244,7 +247,7 @@ try {
     assert.equal(deletes, 1)
     assert.equal(cart.itemCount, 0)
     assert.equal(cart.data.estimated_total, '0.00')
-    assert.match(cart.notice, /Позиция удалена/)
+    assert.match((previous.notifications.current?.message ?? ''), /Позиция удалена/)
   })
 
   await check('invalid edit and delete values never reach API', async () => {
@@ -325,7 +328,7 @@ try {
     resolve(json({ ...row, quantity: 2 }))
     assert.equal(await pending, false)
     assert.equal(cart.itemCount, 0)
-    assert.equal(cart.notice, '')
+    assert.equal((previous.notifications.current?.message ?? ''), '')
   })
 
   await check('edit and delete share the write lock', async () => {
@@ -345,7 +348,7 @@ try {
 
   console.log(`Cart checks: ${passed} passed. No real accounts or database changes.`)
 } finally {
-  previous?.cart.$dispose()
+  previous?.notifications.$dispose(); previous?.cart.$dispose()
   previous?.auth.$dispose()
   globalThis.fetch = originalFetch
   if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)

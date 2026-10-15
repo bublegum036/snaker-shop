@@ -1,4 +1,6 @@
 export const cartItemActionsTexts = {
+  confirmTitle: 'Удаление из корзины',
+  confirmMessage: (name: string, size: string) => `Удалить «${name}», размер ${size}, из корзины?`,
   quantity: 'Количество',
   save: 'Сохранить',
   remove: 'Удалить',

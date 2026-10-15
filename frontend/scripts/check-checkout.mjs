@@ -22,6 +22,7 @@ const previousFetch = (url, init) => handler(String(url), init)
 globalThis.fetch = previousFetch
 try {
   const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth/auth.store.ts')
+  const { useNotificationsStore } = await server.ssrLoadModule('/src/stores/notifications/notifications.store.ts')
   const { useCartStore } = await server.ssrLoadModule('/src/stores/cart/cart.store.ts')
   function defaultHandler(url, init) {
     if (url === '/api/auth/login') return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' }))
@@ -43,7 +44,7 @@ try {
     return Promise.resolve(json(records.get(key), 201))
   }
   function setup(clear = true) {
-    pair?.cart.$dispose(); pair?.auth.$dispose()
+    pair?.notifications.$dispose(); pair?.cart.$dispose(); pair?.auth.$dispose()
     setActivePinia(createPinia())
     setStorage(memoryStorage)
     if (clear) {
@@ -52,7 +53,7 @@ try {
       rejectOrders = undefined; loseResponse = false; failRead = false; user = profile
     }
     handler = defaultHandler
-    pair = { auth: useAuthStore(), cart: useCartStore() }
+    pair = { auth: useAuthStore(), cart: useCartStore(), notifications: useNotificationsStore() }
     return pair
   }
   async function login() { await pair.auth.login(credentials); await flush() }
@@ -69,11 +70,13 @@ try {
     assert.equal(await cart.placeOrder(), true)
     assert.equal(cart.order.total, '4990.00'); assert.equal(cart.itemCount, 0)
     assert.equal(cart.checkoutPending, false); assert.equal(storage.has('north.checkout.9001'), false)
+    assert.match(pair.notifications.current.message, /Заказ №7001 оформлен/)
   })
   await check('lost response replays same key and blocks cart writes', async () => {
     const { cart } = await fresh(); loseResponse = true
     assert.equal(await cart.placeOrder(), false); assert.equal(cart.checkoutPending, true)
     assert.match(cart.checkoutError, /Результат оформления пока неизвестен/)
+    assert.equal(pair.notifications.current, null)
     assert.equal(await cart.addItem(302, 1), false)
     assert.equal(await cart.updateItem(1, 2), false)
     assert.equal(await cart.removeItem(1), false)
@@ -158,7 +161,7 @@ try {
   })
   console.log(`Checkout checks: ${passed} passed. No real orders or database changes.`)
 } finally {
-  pair?.cart.$dispose(); pair?.auth.$dispose()
+  pair?.notifications.$dispose(); pair?.cart.$dispose(); pair?.auth.$dispose()
   globalThis.fetch = originalFetch
   if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)
   else delete globalThis.sessionStorage

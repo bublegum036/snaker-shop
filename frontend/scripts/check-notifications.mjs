@@ -13,6 +13,7 @@ const timers = new Map()
 
 try {
   const { useNotificationsStore } = await server.ssrLoadModule('/src/stores/notifications/notifications.store.ts')
+  const { useSessionActions } = await server.ssrLoadModule('/src/composables/auth/useSessionActions/useSessionActions.ts')
   const { useAuthStore } = await server.ssrLoadModule('/src/stores/auth/auth.store.ts')
   globalThis.setTimeout = (callback, delay) => { const id = ++sequence; timers.set(id, { callback, at: now + delay }); return id }
   globalThis.clearTimeout = (id) => timers.delete(id)
@@ -56,6 +57,12 @@ try {
   await check('role change clears old administrator message', () => {
     auth.accessToken = 'fixture-token'; auth.user = { id: 9001, email: 'fixture@example.com', is_admin: true }
     notifications.success('Saved'); auth.user = { ...auth.user, is_admin: false }; assert.equal(notifications.current, null)
+  })
+  await check('explicit logout shows a new guest success after clearing session', () => {
+    auth.accessToken = 'fixture-token'; auth.user = { id: 9001, email: 'fixture@example.com', is_admin: true }
+    notifications.success('Previous account message'); const { logout } = useSessionActions(); logout()
+    assert.equal(auth.isAuthenticated, false); assert.match(notifications.current.message, /вышли из аккаунта/)
+    advance(3000); assert.equal(notifications.current, null)
   })
   await check('store disposal removes its timer', () => {
     notifications.success('Saved'); notifications.$dispose(); assert.equal(timers.size, 0)

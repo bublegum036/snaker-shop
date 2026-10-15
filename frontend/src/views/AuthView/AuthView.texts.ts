@@ -1,4 +1,6 @@
 export const authViewTexts = {
+  loggedIn: 'Вы вошли в аккаунт.',
+  loginHint: 'Теперь войдите в созданный аккаунт.',
   account: 'Личный кабинет',
   registerTitle: 'Регистрация',
   loginTitle: 'Вход',

@@ -10,14 +10,12 @@ const cart = useCartStore()
 </script>
 
 <template>
-  <section class="cart-page" aria-labelledby="cart-title">
+  <section class="cart-page" aria-labelledby="cart-title" :aria-busy="cart.loading || cart.mutating">
     <div class="cart-heading">
       <h1 id="cart-title">{{ text.title }}</h1>
       <button type="button" class="text-button" :disabled="cart.loading || cart.mutating" @click="cart.loadCart()">{{ text.refresh }}</button>
     </div>
     <p v-if="cart.loading" class="hint-text" role="status">{{ text.loading }}</p>
-    <p v-if="cart.mutating" class="hint-text" role="status">{{ text.updating }}</p>
-    <p v-if="cart.notice" class="hint-text" role="status">{{ cart.notice }}</p>
     <div v-if="cart.error" class="error-text" role="alert">
       <p>{{ cart.error }}</p>
       <button type="button" class="secondary-button" :disabled="cart.loading || cart.mutating" @click="cart.loadCart()">{{ text.retry }}</button>

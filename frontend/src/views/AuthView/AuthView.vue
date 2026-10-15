@@ -4,11 +4,13 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { register } from '@/api/auth.api'
 import { loginDestination } from '@/router/auth-redirect'
+import { useNotificationsStore } from '@/stores/notifications/notifications.store'
 import { ApiError } from '@/api/http.client'
 import { useAuthStore } from '@/stores/auth/auth.store'
 
 const props = defineProps<{ mode: 'login' | 'register' }>()
 const auth = useAuthStore()
+const notifications = useNotificationsStore()
 const router = useRouter()
 const route = useRoute()
 const email = ref('')
@@ -47,8 +49,9 @@ async function submit() {
   try {
     if (registration) {
       await register(credentials, current.signal)
-      if (!current.signal.aborted) registered.value = true
+      if (!current.signal.aborted) { registered.value = true; notifications.success(text.created(email.value)) }
     } else if (await auth.login(credentials, current.signal)) {
+      notifications.success(text.loggedIn)
       // Разрешены только известные страницы, номер заказа проверяется отдельно.
       await router.replace(loginDestination(route.query))
     }
@@ -73,7 +76,7 @@ async function submit() {
     <p class="eyebrow">{{ text.account }}</p>
     <h1 id="auth-title">{{ isRegister ? text.registerTitle : text.loginTitle }}</h1>
     <div v-if="registered" class="auth-success" role="status">
-      <p>{{ text.created(email) }}</p>
+      <p>{{ text.loginHint }}</p>
       <RouterLink class="primary-button" :to="{ name: 'login', query: route.query }">{{ text.goToLogin }}</RouterLink>
     </div>
     <form v-else class="auth-form" @submit.prevent="submit">

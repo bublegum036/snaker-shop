@@ -2,9 +2,11 @@
 import { accountViewTexts as text } from './AccountView.texts'
 import { useRoute } from 'vue-router'
 import { ref } from 'vue'
+import { useNotificationsStore } from '@/stores/notifications/notifications.store'
 import { useAuthStore } from '@/stores/auth/auth.store'
 
 const auth = useAuthStore()
+const notifications = useNotificationsStore()
 const route = useRoute()
 const loading = ref(false)
 const error = ref('')
@@ -12,7 +14,11 @@ const error = ref('')
 async function refresh() {
   loading.value = true
   error.value = ''
-  try { await auth.refreshProfile() }
+  const token = auth.accessToken
+  try {
+    await auth.refreshProfile()
+    if (auth.isAuthenticated && auth.accessToken === token) notifications.success(text.refreshed)
+  }
   catch (cause) {
     error.value = cause instanceof Error ? cause.message : text.refreshFailed
   } finally { loading.value = false }
