@@ -15,7 +15,7 @@ const profile = { id: 9001, email: 'fixture@example.com', is_admin: true }
 const credentials = { email: profile.email, password: 'fixture-only' }
 const brands = [{ id: 1, name: 'Fixture brand' }]
 const body = { name: 'Fixture product', brand_id: 1, price: '7990.00', description: '', image_url: null }
-const product = (id) => ({ id, ...body, name: `Fixture product ${id}`, sizes: [] })
+const product = (id) => ({ id, version: 1, ...body, name: `Fixture product ${id}`, sizes: [] })
 let auth, state, notifications, handler, dataset, user, calls, writes, scope, testPinia, passed = 0
 let code, loseResponse, failRefresh
 
@@ -53,7 +53,10 @@ try {
       result = { id: Math.max(...dataset.map((item) => item.id), 0) + 1, ...JSON.parse(init.body), sizes: [] }
       dataset.push(result)
     } else if (init.method === 'PUT') {
-      result = { ...dataset.find((item) => item.id === id), ...JSON.parse(init.body) }
+      const current = dataset.find((item) => item.id === id)
+      const input = JSON.parse(init.body)
+      if (input.version !== current.version) { return Promise.resolve(json({ detail: 'product_version_conflict' }, 409)) }
+      result = { ...current, ...input, version: current.version + 1 }
       dataset = dataset.map((item) => item.id === id ? result : item)
     } else {
       assert.equal(init.method, 'DELETE'); assert.equal(init.body, undefined)
@@ -143,7 +146,19 @@ try {
     assert.notEqual(original.name, draft.name); state.openEditor(original)
     assert.equal(await state.save(productBody(draft, brands)), true)
     assert.equal(writes[0].url, '/api/products/1'); assert.equal(writes[0].method, 'PUT')
-    assert.equal(state.products.value[0].name, 'Changed')
+    assert.equal(state.products.value[0].name, 'Changed'); assert.equal(writes[0].body.version, 1); assert.equal(state.products.value[0].version, 2)
+  })
+  await check('stale form cannot overwrite a concurrent price and requires reopening', async () => {
+    await fresh(); state.openEditor(state.products.value[0])
+    dataset[0] = { ...dataset[0], price: '9000.00', version: 2 }
+    assert.equal(await state.save({ ...body, description: 'My description' }), false)
+    assert.equal(dataset[0].price, '9000.00'); assert.equal(dataset[0].description, '')
+    assert.match(state.error.value, /другим администратором/)
+    assert.equal(state.requiresReload.value, true); assert.equal(state.editorOpen.value, false)
+    assert.equal(writes.length, 1)
+    await state.load(); state.openEditor(state.products.value[0])
+    assert.equal(await state.save({ ...body, price: '9000.00', description: 'My description' }), true)
+    assert.equal(writes[1].body.version, 2); assert.equal(dataset[0].price, '9000.00')
   })
   await check('delete requires a selected confirmation and accepts empty 204', async () => {
     await fresh(); assert.equal(await state.confirmDelete(), false); assert.equal(writes.length, 0)

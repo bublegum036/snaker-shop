@@ -10,12 +10,12 @@
     {
       "stage": "new venv",
       "passed": true,
-      "seconds": 1.05
+      "seconds": 0.96
     },
     {
       "stage": "install pinned requirements",
       "passed": true,
-      "seconds": 2.54
+      "seconds": 2.36
     },
     {
       "stage": "pip check",
@@ -30,57 +30,62 @@
     {
       "stage": "migrate base schema",
       "passed": true,
-      "seconds": 3.31
+      "seconds": 2.63
     },
     {
       "stage": "verify migrations preserve data",
       "passed": true,
-      "seconds": 0.33
+      "seconds": 0.3
     },
     {
       "stage": "order name and size snapshots",
       "passed": true,
-      "seconds": 2.53
+      "seconds": 2.42
     },
     {
       "stage": "admin order reads and transitions",
       "passed": true,
-      "seconds": 1.5
+      "seconds": 1.42
+    },
+    {
+      "stage": "transaction boundaries versions and single connection pool",
+      "passed": true,
+      "seconds": 0.78
     },
     {
       "stage": "seed catalog",
       "passed": true,
-      "seconds": 0.2
+      "seconds": 0.18
     },
     {
       "stage": "safe HTTP diagnostics",
       "passed": true,
-      "seconds": 1.07
+      "seconds": 1.01
     },
     {
       "stage": "final API acceptance",
       "passed": true,
-      "seconds": 5.5
+      "seconds": 5.51
     },
     {
       "stage": "schema and seed regression",
       "passed": true,
-      "seconds": 0.42
+      "seconds": 0.35
     },
     {
       "stage": "M2-M3 regression",
       "passed": true,
-      "seconds": 3.97
+      "seconds": 3.79
     },
     {
       "stage": "M4-M5 regression",
       "passed": true,
-      "seconds": 6.92
+      "seconds": 6.76
     }
   ],
   "checks": [
     "migration created eight application tables",
-    "migration head is 0003",
+    "migration head is 0004",
     "seed counts are 2/3/4",
     "second seed leaves all data unchanged",
     "final health probes database",
@@ -468,7 +473,8 @@
     "m23": 85,
     "m45": 76,
     "order_snapshots": 18,
-    "admin_orders": 27
+    "admin_orders": 27,
+    "transactions": 18
   },
   "cleanup": "temporary directory and databases removed; working volume preserved"
 }

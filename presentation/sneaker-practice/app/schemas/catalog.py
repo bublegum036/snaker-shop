@@ -17,6 +17,9 @@ class ProductWrite(BaseModel):
             raise ValueError('Name must not be blank')
         return value
 
+class ProductUpdate(ProductWrite):
+    version: int = Field(gt=0, le=2147483647)
+
 class BrandRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
@@ -30,6 +33,7 @@ class SizeRead(BaseModel):
 
 class ProductRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    version: int
     id: int
     name: str
     brand_id: int

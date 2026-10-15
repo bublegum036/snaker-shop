@@ -93,7 +93,8 @@ def verify_idempotency(client, admin, engine):
     response = client.patch(f'/orders/{original["id"]}/status', headers=admin, json={'status': 'processing'})
     assert response.status_code == 200
     response = client.put(f'/products/{pid}', headers=admin,
-                         json={'name': 'Replay Pair', 'brand_id': 1, 'price': '300.00'})
+                         json={'name': 'Replay Pair', 'brand_id': 1, 'price': '300.00',
+                               'version': client.get(f'/products/{pid}').json()['version']})
     assert response.status_code == 200
     add()
     before = snapshot()

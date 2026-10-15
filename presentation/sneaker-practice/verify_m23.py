@@ -180,13 +180,13 @@ def verify():
             r=client.post('/products',json=body,headers=admin_headers)
             pid=r.json()['id']
             check('admin creates product with 201',r.status_code==201 and pid>30 and r.json()['price']=='8990.00')
-            r=client.put('/products/'+str(pid),json={**body,'name':'Updated Pair','price':'9090.00'},headers=admin_headers)
+            r=client.put('/products/'+str(pid),json={**body,'version':client.get('/products/'+str(pid)).json()['version'],'name':'Updated Pair','price':'9090.00'},headers=admin_headers)
             check('admin replaces card with 200',r.status_code==200 and r.json()['price']=='9090.00' and client.get('/products/'+str(pid)).json()['name']=='Updated Pair')
             r=client.delete('/products/'+str(pid),headers=admin_headers)
             check('admin deletes with empty 204',r.status_code==204 and not r.content and client.get('/products/'+str(pid)).status_code==404)
             report['matrix'].append({'identity':'admin','statuses':[201,200,204],'changed':True})
             for method in ['PUT','DELETE']:
-                r=client.request(method,'/products/999',headers=admin_headers,json=body if method=='PUT' else None)
+                r=client.request(method,'/products/999',headers=admin_headers,json={**body,'version':1} if method=='PUT' else None)
                 check('unknown product '+method+' returns 404',r.status_code==404)
             # Isolated historical fixture to prove delete preserves references.
             with engine.begin() as connection:
@@ -196,7 +196,7 @@ def verify():
             r=client.delete('/products/10',headers=admin_headers)
             check('deleting historical product returns 409 and preserves whole state',r.status_code==409 and snapshot()==before)
             report['deletion']={'status':409,'product_id':10,'history_preserved':True}
-            r=client.put('/products/10',json={**body,'name':'North Runner','price':'8990.00'},headers=admin_headers)
+            r=client.put('/products/10',json={**body,'version':client.get('/products/10').json()['version'],'name':'North Runner','price':'8990.00'},headers=admin_headers)
             with engine.connect() as connection:
                 price=str(connection.scalar(text('SELECT price_at_purchase FROM order_items WHERE order_id=501')))
             check('catalog edit preserves historical price',r.status_code==200 and price=='7990.00')

@@ -17,7 +17,7 @@ export function createProduct(request: AuthorizedRequest, body: ProductWrite, si
   return request('/products', { method: 'POST', body: JSON.stringify(body), signal })
 }
 
-export function updateProduct(request: AuthorizedRequest, id: number, body: ProductWrite, signal?: AbortSignal): Promise<Product> {
+export function updateProduct(request: AuthorizedRequest, id: number, body: ProductWrite & Pick<Product, 'version'>, signal?: AbortSignal): Promise<Product> {
   return request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(body), signal })
 }
 

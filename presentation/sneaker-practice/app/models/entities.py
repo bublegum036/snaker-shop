@@ -24,8 +24,10 @@ class Brand(Base):
 
 class Product(Base):
     __tablename__ = 'products'
-    __table_args__ = (CheckConstraint('price > 0', name='ck_products_price'),)
+    __table_args__ = (CheckConstraint('price > 0', name='ck_products_price'),
+                      CheckConstraint('version > 0', name='ck_product_version'))
     id: Mapped[int] = mapped_column(Identity(), primary_key=True)
+    version: Mapped[int] = mapped_column(Integer, server_default='1')
     name: Mapped[str] = mapped_column(Text)
     brand_id: Mapped[int] = mapped_column(ForeignKey('brands.id'))
     description: Mapped[str] = mapped_column(Text, server_default='')

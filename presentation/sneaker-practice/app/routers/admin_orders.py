@@ -1,13 +1,13 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, Query
+from app.schemas.auth import UserRead
 from app.dependencies import require_admin
-from app.models import User
 from app.routers.catalog import PositiveID
 from app.schemas.orders import OrderRead, OrderStatus
 from app.services import orders
 
 router = APIRouter(prefix='/admin/orders', tags=['Orders · admin'])
-Admin = Annotated[User, Depends(require_admin)]
+Admin = Annotated[UserRead, Depends(require_admin)]
 
 
 @router.get('', response_model=list[OrderRead])

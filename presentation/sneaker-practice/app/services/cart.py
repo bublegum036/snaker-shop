@@ -32,14 +32,14 @@ def ensure_quantity(quantity, stock):
     if quantity > stock:
         raise ShopError(409, 'insufficient_stock')
 
-def get_cart(user_id, *, sessions=None):
-    with transaction(owner_id=user_id, sessions=sessions) as db:
+def get_cart(user_id, *, sessions=None, session=None):
+    with transaction(owner_id=user_id, sessions=sessions, session=session) as db:
         items = read_rows(db, user_id)
         result = CartRead(items=items, estimated_total=sum((i.subtotal for i in items), Decimal('0.00')))
     return result
 
-def add_item(user_id, size_id, quantity, *, sessions=None):
-    with transaction(owner_id=user_id, sessions=sessions) as db:
+def add_item(user_id, size_id, quantity, *, sessions=None, session=None):
+    with transaction(owner_id=user_id, sessions=sessions, session=session) as db:
         size = lock_size(db, size_id)
         item = db.scalar(select(CartItem).where(CartItem.user_id == user_id, CartItem.product_size_id == size_id))
         new_quantity = (item.quantity if item else 0) + quantity
@@ -55,8 +55,8 @@ def add_item(user_id, size_id, quantity, *, sessions=None):
         result = next(row for row in read_rows(db, user_id) if row.id == item.id)
     return result
 
-def change_item(user_id, item_id, quantity, *, sessions=None):
-    with transaction(owner_id=user_id, sessions=sessions) as db:
+def change_item(user_id, item_id, quantity, *, sessions=None, session=None):
+    with transaction(owner_id=user_id, sessions=sessions, session=session) as db:
         item = own_item(db, user_id, item_id)
         size = lock_size(db, item.product_size_id)
         ensure_quantity(quantity, size.stock)
@@ -65,6 +65,6 @@ def change_item(user_id, item_id, quantity, *, sessions=None):
         result = next(row for row in read_rows(db, user_id) if row.id == item.id)
     return result
 
-def remove_item(user_id, item_id, *, sessions=None):
-    with transaction(owner_id=user_id, sessions=sessions) as db:
+def remove_item(user_id, item_id, *, sessions=None, session=None):
+    with transaction(owner_id=user_id, sessions=sessions, session=session) as db:
         db.delete(own_item(db, user_id, item_id))

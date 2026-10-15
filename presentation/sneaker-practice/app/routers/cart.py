@@ -1,13 +1,13 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, Response
+from app.schemas.auth import UserRead
 from app.dependencies import get_current_user
-from app.models import User
 from app.routers.catalog import PositiveID
 from app.schemas.cart import CartAdd, Quantity, CartRead, CartItemRead
 from app.services import cart
 
 router = APIRouter(prefix='/cart', tags=['Cart · current user'])
-CurrentUser = Annotated[User, Depends(get_current_user)]
+CurrentUser = Annotated[UserRead, Depends(get_current_user)]
 
 @router.get('', response_model=CartRead)
 def get_cart(user: CurrentUser):

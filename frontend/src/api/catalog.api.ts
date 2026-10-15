@@ -7,6 +7,7 @@ export interface ProductSize {
 }
 
 export interface Product {
+  version: number
   id: number
   name: string
   brand_id: number

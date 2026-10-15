@@ -14,13 +14,11 @@ def register(db, body):
     user = User(email=str(body.email), hashed_password=hash_password(body.password), is_admin=False)
     db.add(user)
     try:
-        db.commit()
+        db.flush()
     except IntegrityError as error:
-        db.rollback()
         if getattr(error.orig,'sqlstate',None) == '23505':
             raise HTTPException(409, 'Email already registered') from None
         raise
-    db.refresh(user)
     return user
 
 def authenticate(db, body):

@@ -1,14 +1,14 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, Response
+from app.schemas.auth import UserRead
 from app.dependencies import require_admin
-from app.models import User
 from app.routers.catalog import PositiveID
 from app.schemas.catalog import SizeRead
 from app.schemas.inventory import SizeCreate, SizePatch
 from app.services import inventory
 
 router = APIRouter(prefix='/products', tags=['Inventory · admin'])
-Admin = Annotated[User, Depends(require_admin)]
+Admin = Annotated[UserRead, Depends(require_admin)]
 
 
 @router.post('/{product_id}/sizes', status_code=201, response_model=SizeRead)

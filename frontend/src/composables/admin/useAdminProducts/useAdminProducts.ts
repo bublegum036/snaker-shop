@@ -86,7 +86,7 @@ export function useAdminProducts() {
   function openEditor(product: Product | null = null) {
     if (!canWrite.value) { return }
     deleting.value = null
-    editing.value = product
+    editing.value = product ? { ...product } : null
     editorVersion.value++
     editorOpen.value = true
     error.value = ''
@@ -139,7 +139,7 @@ export function useAdminProducts() {
           case 403: handleForbidden(); return false
           case 422: error.value = text.invalidInput; return false
           case 404: error.value = text.missing; break
-          case 409: error.value = text.conflict(action); break
+          case 409: error.value = cause.code === 'product_version_conflict' ? text.staleVersion : text.conflict(action); break
           default: error.value = text.uncertain
         }
       } else { error.value = text.uncertain }
@@ -157,7 +157,7 @@ export function useAdminProducts() {
     if (!editorOpen.value) { return false }
     const product = editing.value
     return mutate(product ? 'update' : 'create', body.name, (signal) => product
-      ? updateProduct(auth.authorizedRequest, product.id, body, signal)
+      ? updateProduct(auth.authorizedRequest, product.id, { ...body, version: product.version }, signal)
       : createProduct(auth.authorizedRequest, body, signal))
   }
 

@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
+from app.schemas.auth import UserRead
 from app.dependencies import require_admin
-from app.models import User
 from app.routers.cart import CurrentUser
 from app.routers.catalog import PositiveID
 from app.schemas.orders import CheckoutRequest, StatusUpdate, OrderRead
@@ -34,5 +34,5 @@ def detail(order_id: PositiveID, user: CurrentUser):
     return orders.get_order(user.id, order_id)
 
 @router.patch('/{order_id}/status', response_model=OrderRead)
-def status(order_id: PositiveID, body: StatusUpdate, admin: Annotated[User, Depends(require_admin)]):
+def status(order_id: PositiveID, body: StatusUpdate, admin: Annotated[UserRead, Depends(require_admin)]):
     return orders.change_status(admin.id, order_id, body.status)

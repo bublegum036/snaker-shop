@@ -1,9 +1,9 @@
 from decimal import Decimal
 from sqlalchemy import delete, select
 from sqlalchemy.orm import selectinload
-from app.models import User, CartItem, ProductSize, Product, Order, OrderItem, CheckoutRequestRecord
+from app.models import CartItem, ProductSize, Product, Order, OrderItem, CheckoutRequestRecord
 from app.schemas.orders import OrderRead, OrderItemRead
-from app.services.unit_of_work import ShopError, transaction
+from app.services.unit_of_work import ShopError, transaction, require_admin
 
 
 def dto(order):
@@ -11,12 +11,12 @@ def dto(order):
         total=order.total, created_at=order.created_at,
         items=[OrderItemRead.model_validate(item) for item in sorted(order.items, key=lambda x:x.id)])
 
-def checkout(user_id, *, idempotency_key=None, sessions=None, _test_hook=None):
+def checkout(user_id, *, idempotency_key=None, sessions=None, session=None, _test_hook=None):
     """Hook is an internal Python test seam; no HTTP input can select it."""
     def stage(name, db):
         if _test_hook is not None:
             _test_hook(name, db)
-    with transaction(owner_id=user_id, sessions=sessions) as db:
+    with transaction(owner_id=user_id, sessions=sessions, session=session) as db:
         # The owner's FOR UPDATE lock serializes both retries and cart changes.
         # Replay BEFORE reading the cart: a retry must never buy a new cart.
         if idempotency_key is not None:
@@ -73,18 +73,18 @@ def checkout(user_id, *, idempotency_key=None, sessions=None, _test_hook=None):
             ))
             db.flush()
             stage('after_idempotency_record', db)
-    # Commit succeeded and the new session is closed before returning the DTO.
+    # Standalone calls have committed; joined calls leave commit to the outer owner.
     return result
 
-def list_orders(user_id, *, limit=20, offset=0, sessions=None):
-    with transaction(sessions=sessions) as db:
+def list_orders(user_id, *, limit=20, offset=0, sessions=None, session=None):
+    with transaction(sessions=sessions, session=session) as db:
         rows = db.scalars(select(Order).where(Order.user_id == user_id)
             .options(selectinload(Order.items)).order_by(Order.id.desc()).limit(limit).offset(offset))
         result = [dto(order) for order in rows]
     return result
 
-def get_order(user_id, order_id, *, sessions=None):
-    with transaction(sessions=sessions) as db:
+def get_order(user_id, order_id, *, sessions=None, session=None):
+    with transaction(sessions=sessions, session=session) as db:
         order = db.scalar(select(Order).where(Order.id == order_id, Order.user_id == user_id)
             .options(selectinload(Order.items)))
         if order is None:
@@ -92,8 +92,8 @@ def get_order(user_id, order_id, *, sessions=None):
         result = dto(order)
     return result
 
-def change_status(admin_id, order_id, status, *, sessions=None):
-    with transaction(sessions=sessions) as db:
+def change_status(admin_id, order_id, status, *, sessions=None, session=None):
+    with transaction(sessions=sessions, session=session) as db:
         # Recheck the role in the writing transaction; keep it stable until commit.
         require_order_admin(db, admin_id)
         order = db.scalar(select(Order).where(Order.id == order_id).with_for_update())
@@ -108,16 +108,11 @@ def change_status(admin_id, order_id, status, *, sessions=None):
     return result
 
 
-def require_order_admin(db, admin_id):
-    admin = db.scalar(select(User).where(User.id == admin_id).with_for_update(read=True))
-    if admin is None:
-        raise ShopError(401, 'unknown_user')
-    if not admin.is_admin:
-        raise ShopError(403, 'admin_required')
+# Kept as an alias for existing instructional callers.
+require_order_admin = require_admin
 
-
-def list_admin_orders(admin_id, *, limit=20, offset=0, status=None, sessions=None):
-    with transaction(sessions=sessions) as db:
+def list_admin_orders(admin_id, *, limit=20, offset=0, status=None, sessions=None, session=None):
+    with transaction(sessions=sessions, session=session) as db:
         require_order_admin(db, admin_id)
         query = select(Order).options(selectinload(Order.items)).order_by(Order.id.desc())
         if status is not None:
@@ -125,8 +120,8 @@ def list_admin_orders(admin_id, *, limit=20, offset=0, status=None, sessions=Non
         return [dto(order) for order in db.scalars(query.limit(limit).offset(offset))]
 
 
-def get_admin_order(admin_id, order_id, *, sessions=None):
-    with transaction(sessions=sessions) as db:
+def get_admin_order(admin_id, order_id, *, sessions=None, session=None):
+    with transaction(sessions=sessions, session=session) as db:
         require_order_admin(db, admin_id)
         order = db.scalar(select(Order).where(Order.id == order_id).options(selectinload(Order.items)))
         if order is None:

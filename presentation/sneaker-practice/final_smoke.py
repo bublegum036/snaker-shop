@@ -36,7 +36,7 @@ def verify():
             return {t:[tuple(row) for row in db.execute(select(Base.metadata.tables[t]).order_by(Base.metadata.tables[t].c.id))] for t in Base.metadata.tables}
     with engine.connect() as db:
         check('migration created eight application tables',len(Base.metadata.tables)==8 and all(db.scalar(text('SELECT to_regclass(:name)'),{'name':name}) for name in Base.metadata.tables))
-        check('migration head is 0003',db.scalar(text('SELECT version_num FROM alembic_version'))=='0003')
+        check('migration head is 0004',db.scalar(text('SELECT version_num FROM alembic_version'))=='0004')
         check('seed counts are 2/3/4',tuple(db.execute(text('SELECT (SELECT count(*) FROM brands),(SELECT count(*) FROM products),(SELECT count(*) FROM product_sizes)')).one())==(2,3,4))
     before=snapshot()
     subprocess.run([sys.executable,'-m','app.seed'],cwd=ROOT,check=True,capture_output=True,timeout=20)
@@ -67,7 +67,7 @@ def verify():
         journey.append({'step':'Каталог','status':200,'result':'101: 7990.00 / stock 3; 201: 5990.00 / stock 5'})
         body={'name':'Review Pair','brand_id':1,'price':'8990.00','description':'Local final check','image_url':None}
         p=client.post('/products',headers=admin,json=body);check('admin create product',p.status_code==201);pid=p.json()['id']
-        p=client.put(f'/products/{pid}',headers=admin,json={**body,'price':'8991.00'});check('admin update product',p.status_code==200 and p.json()['price']=='8991.00')
+        p=client.put(f'/products/{pid}',headers=admin,json={**body,'version':client.get(f'/products/{pid}').json()['version'],'price':'8991.00'});check('admin update product',p.status_code==200 and p.json()['price']=='8991.00')
         check('admin delete unreferenced product',client.delete(f'/products/{pid}',headers=admin).status_code==204)
         p=client.post('/cart/items',headers=anya,json={'product_size_id':101,'quantity':1});check('add cart item',p.status_code==200);cid=p.json()['id']
         p=client.patch(f'/cart/items/{cid}',headers=anya,json={'quantity':2});check('set absolute cart quantity',p.status_code==200 and p.json()['quantity']==2)

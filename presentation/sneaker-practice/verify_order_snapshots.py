@@ -56,7 +56,7 @@ def verify():
         def snapshot(include_new=False):
             with engine.connect() as db:
                 return {table: [{key: value for key, value in row.items()
-                    if include_new or key not in {'name_at_purchase', 'size_at_purchase'}}
+                    if include_new or key not in {'name_at_purchase', 'size_at_purchase', 'version'}}
                     for row in db.execute(text(f'SELECT * FROM {table} ORDER BY id')).mappings()]
                     for table in table_names}
         before = snapshot()

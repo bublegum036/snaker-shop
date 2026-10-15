@@ -16,7 +16,7 @@ def verify():
     def snapshot():
         with engine.connect() as db:
             return {name: [tuple(row) for row in db.execute(select(*[column for column in table.c
-                        if column.name not in {'name_at_purchase', 'size_at_purchase'}]).order_by(table.c.id))]
+                        if column.name not in {'name_at_purchase', 'size_at_purchase', 'version'}]).order_by(table.c.id))]
                     for name, table in tables.items()}
 
     with engine.connect() as db:
@@ -33,7 +33,7 @@ def verify():
     assert snapshot() == before
     with engine.connect() as db:
         assert db.scalar(text('SELECT count(*) FROM checkout_requests')) == 0
-        assert db.scalar(text('SELECT version_num FROM alembic_version')) == '0003'
+        assert db.scalar(text('SELECT version_num FROM alembic_version')) == '0004'
     command.downgrade(config, '0001')
     assert snapshot() == before
     command.upgrade(config, 'head')

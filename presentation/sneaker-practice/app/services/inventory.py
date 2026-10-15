@@ -2,24 +2,19 @@
 from contextlib import contextmanager
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from app.models import User, Product, ProductSize, CartItem, OrderItem
+from app.models import Product, ProductSize, CartItem, OrderItem
 from app.schemas.catalog import SizeRead
-from app.services.unit_of_work import ShopError, transaction
+from app.services.unit_of_work import ShopError, transaction, require_admin
 
 
 @contextmanager
-def admin_transaction(admin_id, *, sessions=None):
+def admin_transaction(admin_id, *, sessions=None, session=None):
     try:
-        with transaction(sessions=sessions) as db:
-            # Keep the role stable throughout this write, like order status changes.
-            admin = db.scalar(select(User).where(User.id == admin_id).with_for_update(read=True))
-            if admin is None:
-                raise ShopError(401, 'unknown_user')
-            if not admin.is_admin:
-                raise ShopError(403, 'admin_required')
+        with transaction(sessions=sessions, session=session) as db:
+            require_admin(db, admin_id)
             yield db
     except IntegrityError as error:
-        # The transaction context has already rolled back all writes.
+        # Owned contexts have rolled back; joined failures must escape to the owner.
         reason = {
             '23505': 'size_already_exists',
             '23503': 'size_referenced',
@@ -46,8 +41,8 @@ def referenced(db, size_id):
     )
 
 
-def create_size(admin_id, product_id, body, *, sessions=None):
-    with admin_transaction(admin_id, sessions=sessions) as db:
+def create_size(admin_id, product_id, body, *, sessions=None, session=None):
+    with admin_transaction(admin_id, sessions=sessions, session=session) as db:
         # A key-share lock keeps the parent present until the child is committed.
         product = db.scalar(select(Product.id).where(Product.id == product_id)
                             .with_for_update(read=True, key_share=True))
@@ -60,8 +55,8 @@ def create_size(admin_id, product_id, body, *, sessions=None):
     return result
 
 
-def patch_size(admin_id, product_id, size_id, body, *, sessions=None):
-    with admin_transaction(admin_id, sessions=sessions) as db:
+def patch_size(admin_id, product_id, size_id, body, *, sessions=None, session=None):
+    with admin_transaction(admin_id, sessions=sessions, session=session) as db:
         size = lock_size(db, product_id, size_id)
         values = body.model_dump(exclude_unset=True)
         # Changing the variant identity would also change old cart/order references.
@@ -74,8 +69,8 @@ def patch_size(admin_id, product_id, size_id, body, *, sessions=None):
     return result
 
 
-def delete_size(admin_id, product_id, size_id, *, sessions=None):
-    with admin_transaction(admin_id, sessions=sessions) as db:
+def delete_size(admin_id, product_id, size_id, *, sessions=None, session=None):
+    with admin_transaction(admin_id, sessions=sessions, session=session) as db:
         size = lock_size(db, product_id, size_id)
         if referenced(db, size.id):
             raise ShopError(409, 'size_referenced')
