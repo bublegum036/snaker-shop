@@ -10,6 +10,7 @@ const titles: Readonly<Record<string, string>> = {
   cart: 'Корзина',
   orders: 'Ваши заказы',
   'order-details': 'Детали заказа',
+  'not-found': 'Страница не найдена',
 }
 
 export const routerTexts = {
