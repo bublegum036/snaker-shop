@@ -6,8 +6,8 @@ import AccountView from '@/views/AccountView/AccountView.vue'
 import CartView from '@/views/CartView/CartView.vue'
 import OrdersView from '@/views/OrdersView/OrdersView.vue'
 import OrderDetailsView from '@/views/OrderDetailsView/OrderDetailsView.vue'
-import { loginReturnQuery } from './auth-redirect'
-import { useAuthStore } from '@/stores/auth/auth.store'
+import AdminProductsView from '@/views/AdminProductsView/AdminProductsView.vue'
+import { sessionGuard } from './session-guard'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,6 +15,7 @@ const router = createRouter({
     { path: '/', name: 'catalog', component: CatalogView },
     { path: '/login', name: 'login', component: AuthView, props: { mode: 'login' }, meta: { guestOnly: true } },
     { path: '/register', name: 'register', component: AuthView, props: { mode: 'register' }, meta: { guestOnly: true } },
+    { path: '/admin/products', name: 'admin-products', component: AdminProductsView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: '/account', name: 'account', component: AccountView, meta: { requiresAuth: true } },
     { path: '/orders', name: 'orders', component: OrdersView, meta: { requiresAuth: true } },
     { path: '/orders/:orderId', name: 'order-details', component: OrderDetailsView, props: (route) => ({ orderId: String(route.params.orderId) }), meta: { requiresAuth: true } },
@@ -22,15 +23,7 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to) => {
-  if (!to.meta.requiresAuth && !to.meta.guestOnly) return
-  const auth = useAuthStore()
-  await auth.restoreSession()
-  if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    return { name: 'login', query: loginReturnQuery(to) }
-  }
-  if (to.meta.guestOnly && auth.isAuthenticated) return { name: 'account' }
-})
+router.beforeEach(sessionGuard)
 
 router.afterEach((to) => {
   document.title = text.pageTitle(String(to.name))

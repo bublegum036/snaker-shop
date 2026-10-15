@@ -34,13 +34,17 @@ export interface CatalogQuery extends ProductFilters {
   offset: number
 }
 
-export async function getProducts(query: CatalogQuery, signal?: AbortSignal): Promise<Product[]> {
+export function catalogQueryParams(query: CatalogQuery): URLSearchParams {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(query)) {
     // В частности, цена 0 должна попасть в запрос; пустые поля — нет.
     if (value !== undefined && value !== '') params.set(key, String(value))
   }
-  const response = await fetch(`/api/products?${params}`, { signal })
+  return params
+}
+
+export async function getProducts(query: CatalogQuery, signal?: AbortSignal): Promise<Product[]> {
+  const response = await fetch(`/api/products?${catalogQueryParams(query)}`, { signal })
   if (!response.ok) {
     throw new Error(text.productsFailed(response.status))
   }

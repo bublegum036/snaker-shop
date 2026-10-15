@@ -95,7 +95,12 @@ For frontend stages, run `npm run build` from `frontend/` with a compatible
 Node.js (the working local version is 22.12). For authentication changes,
 also run `npm run check:auth`; these isolated checks do not touch real accounts.
 For cart changes, also run `npm run check:cart`; for checkout changes run
-`npm run check:checkout` too; for order-history changes run `npm run check:orders`. Preserve pending checkout keys across retries and
+`npm run check:checkout` too; for order-history changes run `npm run check:orders`.
+For admin-product changes run `npm run check:admin-products`; preserve role guards,
+confirmation before deletion and explicit reconciliation after uncertain writes.
+Use the shared ConfirmDialog for confirmations without changing page flow.
+Admin successes use the shared notifications store/host and expire after 3000ms.
+Run `npm run check:notifications` when changing notifications or their timers. Preserve pending checkout keys across retries and
 reloads, scope them to the user, and block cart mutations until the result is known.
 Preserve server totals,
 session isolation and the rule that uncertain additive POSTs are not auto-retried.
@@ -110,10 +115,12 @@ in adjacent `*.texts.ts` modules too; templates should reference these constants
 Technical strings (routes, CSS classes, event names, API codes) stay with logic.
 Keep each component and its texts in a `ComponentName/` folder, grouped under
 `components/catalog/`, `components/cart/`, `components/auth/` or
-`components/layout/` or `components/orders/`. Give each page its own `views/ViewName/` folder too.
+`components/layout/`, `components/orders/`, `components/admin/` or
+`components/common/`. Give each page its own `views/ViewName/` folder too.
 Import `.vue` files directly; do not add a barrel file for every component.
 Keep the root `src/App.vue` and shared API/store/router modules in their roles.
-Keep page-local order loading in `composables/orders/<composableName>/`,
+Keep page-local loading in `composables/orders/<composableName>/` or
+`composables/admin/<composableName>/`,
 with adjacent texts. Cancel reads on disposal and reset them when the session changes.
 Group each Pinia store with its texts in `stores/<domain>/`, for example
 `stores/cart/cart.store.ts` and `stores/cart/cart.store.texts.ts`.

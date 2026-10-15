@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { accountViewTexts as text } from './AccountView.texts'
+import { useRoute } from 'vue-router'
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth/auth.store'
 
 const auth = useAuthStore()
+const route = useRoute()
 const loading = ref(false)
 const error = ref('')
 
@@ -21,6 +23,7 @@ async function refresh() {
   <section v-if="auth.user" class="auth-page" aria-labelledby="account-title">
     <p class="eyebrow">{{ text.account }}</p>
     <h1 id="account-title">{{ text.title }}</h1>
+    <p v-if="route.query.access === 'admin-required'" class="error-text" role="alert">{{ text.adminRequired }}</p>
     <dl class="profile-details">
       <div><dt>{{ text.email }}</dt><dd>{{ auth.user.email }}</dd></div>
       <div><dt>{{ text.userId }}</dt><dd>{{ auth.user.id }}</dd></div>

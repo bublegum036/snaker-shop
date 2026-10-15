@@ -3,6 +3,7 @@ const titles: Readonly<Record<string, string>> = {
   login: 'Вход',
   register: 'Регистрация',
   account: 'Ваш профиль',
+  'admin-products': 'Управление товарами',
   cart: 'Корзина',
   orders: 'Ваши заказы',
   'order-details': 'Детали заказа',

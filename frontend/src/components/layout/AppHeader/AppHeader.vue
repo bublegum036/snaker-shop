@@ -14,6 +14,7 @@ const auth = useAuthStore()
     <div class="header-account">
       <span v-if="auth.initializing" class="hint-text" role="status">{{ text.checking }}</span>
       <template v-else-if="auth.isAuthenticated">
+        <RouterLink v-if="auth.user?.is_admin" :to="{ name: 'admin-products' }">{{ text.adminProducts }}</RouterLink>
         <CartLink />
         <RouterLink :to="{ name: 'orders' }">{{ text.orders }}</RouterLink>
         <RouterLink class="account-link" :to="{ name: 'account' }">{{ auth.user?.email }}</RouterLink>

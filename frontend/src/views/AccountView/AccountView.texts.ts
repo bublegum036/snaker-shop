@@ -1,6 +1,7 @@
 export const accountViewTexts = {
   account: 'Личный кабинет',
   title: 'Ваш профиль',
+  adminRequired: 'Для управления магазином нужен доступ администратора.',
   email: 'Email',
   userId: 'Номер пользователя',
   role: 'Роль',
