@@ -20,6 +20,14 @@ const hasLegacyItems = computed(() => props.order.items.some((item) => item.name
 
 <style scoped>
 .order-contents { margin-top: 32px; }
-ul { list-style: none; padding: 0; }
-li { padding: 20px 0; border-bottom: 1px solid var(--color-border); }
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--color-border);
+}
 </style>

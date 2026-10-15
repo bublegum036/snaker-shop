@@ -19,25 +19,22 @@ watch(() => props.item.quantity, (value) => {
 
 async function save() {
   error.value = ''
-  if (busy.value || quantity.value === props.item.quantity) return
+  if (busy.value || quantity.value === props.item.quantity) { return }
   if (typeof quantity.value !== 'number' || !Number.isInteger(quantity.value) || quantity.value < 1 || quantity.value > props.item.stock) {
     error.value = text.invalidQuantity
     return
   }
-  try { await cart.updateItem(props.item.id, quantity.value) }
-  catch { /* Серверная ошибка показана страницей через cart.error. */ }
+  try { await cart.updateItem(props.item.id, quantity.value) } catch { /* Серверная ошибка показана страницей через cart.error. */ }
 }
 
-function requestRemove() { if (!busy.value) confirming.value = true }
-function cancelRemove() { if (!cart.mutating) confirming.value = false }
+function requestRemove() { if (!busy.value) { confirming.value = true } }
+function cancelRemove() { if (!cart.mutating) { confirming.value = false } }
 
-watch(() => cart.data, (data) => { if (!data && !cart.mutating) confirming.value = false })
+watch(() => cart.data, (data) => { if (!data && !cart.mutating) { confirming.value = false } })
 
 async function remove() {
-  if (busy.value || !confirming.value) return
-  try { await cart.removeItem(props.item.id) }
-  catch { /* Серверная ошибка показана страницей через cart.error. */ }
-  finally { confirming.value = false }
+  if (busy.value || !confirming.value) { return }
+  try { await cart.removeItem(props.item.id) } catch { /* Серверная ошибка показана страницей через cart.error. */ } finally { confirming.value = false }
 }
 </script>
 

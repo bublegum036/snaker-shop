@@ -37,11 +37,48 @@ const { orders, loading, error, page, requestedPage, hasNextPage, load } = useOr
 </template>
 
 <style scoped>
-.orders-page { max-width: 900px; margin: 64px auto; }
-.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-h1 { margin: 0; font-size: clamp(36px, 5vw, 56px); letter-spacing: -2px; }
-ul { list-style: none; padding: 0; }
-li { padding: 24px 0; border-bottom: 1px solid var(--color-border); }
-.details-link, .catalog-link { display: inline-block; margin-top: 24px; text-decoration: underline; text-underline-offset: 3px; }
-.pagination { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+.orders-page {
+  max-width: 900px;
+  margin: 64px auto;
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(36px, 5vw, 56px);
+  letter-spacing: -2px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.details-link, .catalog-link {
+  display: inline-block;
+  margin-top: 24px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
 </style>

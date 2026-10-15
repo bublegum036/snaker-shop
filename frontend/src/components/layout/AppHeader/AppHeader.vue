@@ -71,7 +71,7 @@ nav {
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .site-header {
     min-height: 76px;
     justify-content: space-between;

@@ -13,12 +13,12 @@ interface RequestOptions extends RequestInit {
 
 // Отправляем JWT только в локальный API; пароль и ответы с токеном не логируем.
 export async function requestJson<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  if (!path.startsWith('/') || path.startsWith('//')) throw new Error(text.invalidPath)
+  if (!path.startsWith('/') || path.startsWith('//')) { throw new Error(text.invalidPath) }
   const { token, signal, ...init } = options
   const headers = new Headers(init.headers)
   headers.set('Accept', 'application/json')
-  if (init.body) headers.set('Content-Type', 'application/json')
-  if (token) headers.set('Authorization', `Bearer ${token}`)
+  if (init.body) { headers.set('Content-Type', 'application/json') }
+  if (token) { headers.set('Authorization', `Bearer ${token}`) }
 
   const timeout = new AbortController()
   const timer = setTimeout(() => timeout.abort(), 10_000)
@@ -35,9 +35,9 @@ export async function requestJson<T>(path: string, options: RequestOptions = {})
     }
     return response.status === 204 ? undefined as T : await response.json()
   } catch (cause) {
-    if (signal?.aborted) throw cause
-    if (timeout.signal.aborted) throw new Error(text.timeout)
-    if (cause instanceof TypeError) throw new Error(text.networkError)
+    if (signal?.aborted) { throw cause }
+    if (timeout.signal.aborted) { throw new Error(text.timeout, { cause }) }
+    if (cause instanceof TypeError) { throw new Error(text.networkError, { cause }) }
     throw cause
   } finally {
     clearTimeout(timer)

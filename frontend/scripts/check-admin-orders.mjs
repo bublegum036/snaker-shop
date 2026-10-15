@@ -23,10 +23,10 @@ try {
   const { useAdminOrderDetails } = await server.ssrLoadModule('/src/composables/admin/useAdminOrderDetails/useAdminOrderDetails.ts')
   const { loginDestination, loginReturnQuery } = await server.ssrLoadModule('/src/router/auth-redirect.ts')
   function defaultHandler(url, init) {
-    if (url === '/api/auth/login') return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' }))
-    if (url === '/api/auth/me') return Promise.resolve(json(user))
+    if (url === '/api/auth/login') { return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' })) }
+    if (url === '/api/auth/me') { return Promise.resolve(json(user)) }
     assert.equal(init.headers.get('Authorization'), 'Bearer fixture-token'); calls.push(url)
-    if (failure) return Promise.resolve(json({ detail: failure.code }, failure.status))
+    if (failure) { return Promise.resolve(json({ detail: failure.code }, failure.status)) }
     const parsed = new URL(url, 'http://fixture.local')
     if (parsed.pathname === '/api/admin/orders') {
       const status = parsed.searchParams.get('status')
@@ -35,12 +35,12 @@ try {
       return Promise.resolve(json(rows.slice(offset, offset + limit)))
     }
     const order = dataset.find((row) => row.id === Number(parsed.pathname.split('/')[init.method ? 3 : 4]))
-    if (!order) return Promise.resolve(json({ detail: 'order_not_found' }, 404))
+    if (!order) { return Promise.resolve(json({ detail: 'order_not_found' }, 404)) }
     if (init.method) {
       assert.equal(init.method, 'PATCH'); assert.match(url, /^\/api\/orders\/\d+\/status$/)
       const body = JSON.parse(init.body); assert.deepEqual(Object.keys(body), ['status']); writes.push(body)
       order.status = body.status
-      if (loseResponse) return Promise.reject(new TypeError('response lost'))
+      if (loseResponse) { return Promise.reject(new TypeError('response lost')) }
     }
     return Promise.resolve(json(order))
   }
@@ -142,7 +142,6 @@ try {
   console.log(`Admin order checks: ${passed} passed. No real orders or status changes.`)
 } finally {
   scopes.forEach((scope) => scope.stop()); notifications?.$dispose(); auth?.$dispose(); globalThis.fetch = originalFetch
-  if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)
-  else delete globalThis.sessionStorage
+  if (originalStorage) { Object.defineProperty(globalThis, 'sessionStorage', originalStorage) } else { delete globalThis.sessionStorage }
   await server.close()
 }

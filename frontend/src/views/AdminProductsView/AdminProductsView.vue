@@ -47,9 +47,36 @@ const { products, brands, loading, saving, busy, error, accessDenied, page, requ
 </template>
 
 <style scoped>
-.admin-page { max-width: 1000px; margin: 64px auto; }
-.page-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
-h1 { margin: 0; font-size: clamp(32px, 5vw, 52px); letter-spacing: -2px; }
-ul { list-style: none; padding: 0; }
-.pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+.admin-page {
+  max-width: 1000px;
+  margin: 64px auto;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 52px);
+  letter-spacing: -2px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
 </style>

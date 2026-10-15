@@ -34,8 +34,29 @@ const { order, loading, saving, error, busy, isAdmin, nextStatus, canChange, con
 </template>
 
 <style scoped>
-.admin-order { max-width: 1000px; margin: 64px auto; }
-.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-h1 { margin: 0; font-size: clamp(32px, 5vw, 52px); letter-spacing: -2px; }
-.back-link { display: block; margin-top: 24px; text-decoration: underline; text-underline-offset: 3px; }
+.admin-order {
+  max-width: 1000px;
+  margin: 64px auto;
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 52px);
+  letter-spacing: -2px;
+}
+
+.back-link {
+  display: block;
+  margin-top: 24px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 </style>

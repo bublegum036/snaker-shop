@@ -5,11 +5,12 @@
   --color-muted: #687166;
   --color-background: #f7f7f2;
   --color-text: #202722;
+
   font-family: 'Helvetica Neue', Arial, sans-serif;
   color: var(--color-text);
   background: var(--color-background);
   font-synthesis: none;
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
 }
 
 * {
@@ -39,11 +40,6 @@ button:disabled {
   cursor: wait;
 }
 
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 3px;
-}
-
 input, select {
   font: inherit;
   color: inherit;
@@ -52,6 +48,11 @@ input, select {
   background: #fcfcf8;
   padding: 12px;
   border-radius: 0;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
 }
 
 .primary-button, .secondary-button {

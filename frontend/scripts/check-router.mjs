@@ -44,7 +44,7 @@ try {
   })
   await check('every deferred page loads and compiles', async () => {
     for (const route of routes) {
-      if (route.name === 'catalog') continue
+      if (route.name === 'catalog') { continue }
       assert.equal(typeof route.component, 'function')
       assert.ok((await route.component()).default)
     }

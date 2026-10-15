@@ -18,7 +18,7 @@ export function useOrderDetails(orderId: () => string) {
     order.value = null
     loading.value = false
     error.value = ''
-    if (disposed || !auth.isAuthenticated) return
+    if (disposed || !auth.isAuthenticated) { return }
     const id = orderId()
     if (!isPositiveId(id)) { error.value = text.invalidId; return }
     const current = new AbortController()
@@ -26,14 +26,14 @@ export function useOrderDetails(orderId: () => string) {
     loading.value = true
     try {
       const result = await getOrder(auth.authorizedRequest, id, current.signal)
-      if (!current.signal.aborted) order.value = result
+      if (!current.signal.aborted) { order.value = result }
     } catch (cause) {
       if (!current.signal.aborted) {
         error.value = cause instanceof ApiError && cause.status === 404
           ? text.notFound : cause instanceof Error ? cause.message : text.loadFailed
       }
     } finally {
-      if (request === current) loading.value = false
+      if (request === current) { loading.value = false }
     }
   }
 

@@ -27,10 +27,33 @@ const brandName = computed(() => props.brands.find((brand) => brand.id === props
 </template>
 
 <style scoped>
-.product-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-block: 24px; border-bottom: 1px solid var(--color-border); flex-wrap: wrap; }
-h2 { margin: 0; font-size: 22px; overflow-wrap: anywhere; }
+.product-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 24px;
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+h2 {
+  margin: 0;
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
 p { margin-bottom: 0; }
-.row-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.inventory-link { text-decoration: underline; text-underline-offset: 3px; }
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.inventory-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .remove-button { color: var(--color-error); }
 </style>

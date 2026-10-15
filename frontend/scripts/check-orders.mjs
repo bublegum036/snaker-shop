@@ -22,8 +22,8 @@ try {
   const { useOrderDetails } = await server.ssrLoadModule('/src/composables/orders/useOrderDetails/useOrderDetails.ts')
   const { loginDestination, loginReturnQuery } = await server.ssrLoadModule('/src/router/auth-redirect.ts')
   function defaultHandler(url, init) {
-    if (url === '/api/auth/login') return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' }))
-    if (url === '/api/auth/me') return Promise.resolve(json(user))
+    if (url === '/api/auth/login') { return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' })) }
+    if (url === '/api/auth/me') { return Promise.resolve(json(user)) }
     assert.equal(init.headers.get('Authorization'), 'Bearer fixture-token')
     assert.equal(init.method, undefined)
     calls.push(url)
@@ -85,7 +85,7 @@ try {
   await check('logout clears both resources and discards delayed responses', async () => {
     await fresh()
     const history = mount(useOrderHistory).state; const details = mount(() => useOrderDetails(() => '100')).state; await flush()
-    let resolvers = []; handler = () => new Promise((done) => resolvers.push(done))
+    const resolvers = []; handler = () => new Promise((done) => resolvers.push(done))
     const oldHistory = history.load(); const oldDetail = details.load(); auth.logout()
     resolvers[0](json([fixture(100)])); resolvers[1](json(fixture(100)))
     await Promise.all([oldHistory, oldDetail])
@@ -160,7 +160,6 @@ try {
 } finally {
   scopes.forEach((scope) => scope.stop()); auth?.$dispose()
   globalThis.fetch = originalFetch
-  if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)
-  else delete globalThis.sessionStorage
+  if (originalStorage) { Object.defineProperty(globalThis, 'sessionStorage', originalStorage) } else { delete globalThis.sessionStorage }
   await server.close()
 }

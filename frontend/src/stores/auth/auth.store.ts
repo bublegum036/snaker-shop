@@ -12,8 +12,7 @@ function readToken(): string | null {
 
 function saveToken(value: string | null) {
   try {
-    if (value) sessionStorage.setItem(STORAGE_KEY, value)
-    else sessionStorage.removeItem(STORAGE_KEY)
+    if (value) { sessionStorage.setItem(STORAGE_KEY, value) } else { sessionStorage.removeItem(STORAGE_KEY) }
   } catch { /* При запрете хранилища вход работает в памяти до обновления. */ }
 }
 
@@ -44,7 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
   // Обрабатываем 401 и для будущих запросов корзины/заказов.
   async function authorizedRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
     const token = accessToken.value
-    if (!token) throw new ApiError(401)
+    if (!token) { throw new ApiError(401) }
     const version = revision
     try {
       return await requestJson<T>(path, { ...options, token })
@@ -57,8 +56,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function restoreSession() {
-    if (restoration) return restoration
-    if (!initializing.value && !sessionError.value) return
+    if (restoration) { return restoration }
+    if (!initializing.value && !sessionError.value) { return }
     const token = accessToken.value ?? readToken()
     if (!token) { initializing.value = false; return }
     const request = new AbortController()
@@ -70,16 +69,16 @@ export const useAuthStore = defineStore('auth', () => {
     restoration = (async () => {
       try {
         const profile = await getProfile(token, request.signal)
-        if (version === revision) user.value = profile
+        if (version === revision) { user.value = profile }
       } catch (cause) {
-        if (version !== revision) return
+        if (version !== revision) { return }
         if (cause instanceof ApiError && cause.status === 401) {
           logout(text.sessionEnded)
         } else {
           sessionError.value = text.restoreFailed
         }
       } finally {
-        if (version === revision) initializing.value = false
+        if (version === revision) { initializing.value = false }
         restoration = undefined
       }
     })()
@@ -95,20 +94,20 @@ export const useAuthStore = defineStore('auth', () => {
       const result = await loginRequest(credentials, signal)
       const profile = await getProfile(result.access_token, signal)
       // Выход во время запроса не должен быть отменён запоздавшим ответом.
-      if (version !== revision || signal?.aborted) return false
+      if (version !== revision || signal?.aborted) { return false }
       accessToken.value = result.access_token
       user.value = profile
       saveToken(result.access_token)
       return true
     } finally {
-      if (version === revision) busy.value = false
+      if (version === revision) { busy.value = false }
     }
   }
 
   async function refreshProfile() {
     const version = revision
     const profile = await authorizedRequest<User>('/auth/me')
-    if (version === revision) user.value = profile
+    if (version === revision) { user.value = profile }
   }
 
   return {

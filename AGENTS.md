@@ -92,7 +92,12 @@ JavaScript copies consistent when editing them.
 ## Data and documentation
 
 For frontend stages, run `npm run build` from `frontend/` with a compatible
-Node.js (the working local version is 22.12). For authentication changes,
+Node.js (use frontend/.nvmrc: 24.19.0; ESLint 10 needs Node 20.19+,
+22.13+ or 24+). Run `npm run lint` for frontend changes. Use `npm run check`
+for lint, build and all isolated frontend scenarios; `npm run lint:fix` changes
+source and must be reviewed. ESLint covers JS/TS/Vue and Stylelint covers CSS
+and Vue style blocks; preserve both configurations and fix violations instead
+of adding blanket disables. For authentication changes,
 also run `npm run check:auth`; these isolated checks do not touch real accounts.
 For cart changes, also run `npm run check:cart`; for checkout changes run
 `npm run check:checkout` too; for order-history changes run `npm run check:orders`.

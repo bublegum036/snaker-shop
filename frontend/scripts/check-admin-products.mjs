@@ -30,21 +30,21 @@ try {
   const { watchSessionNavigation } = await server.ssrLoadModule('/src/router/session-navigation.ts')
   const { loginDestination, loginReturnQuery } = await server.ssrLoadModule('/src/router/auth-redirect.ts')
   function defaultHandler(url, init) {
-    if (url === '/api/auth/login') return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' }))
-    if (url === '/api/auth/me') return Promise.resolve(json(user))
+    if (url === '/api/auth/login') { return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' })) }
+    if (url === '/api/auth/me') { return Promise.resolve(json(user)) }
     assert.equal(init.headers.get('Authorization'), 'Bearer fixture-token')
     calls.push(url)
     const parsed = new URL(url, 'http://fixture.local')
     if (!init.method) {
-      if (failRefresh) return Promise.reject(new TypeError('offline'))
-      if (parsed.pathname === '/api/brands') return Promise.resolve(json(brands))
+      if (failRefresh) { return Promise.reject(new TypeError('offline')) }
+      if (parsed.pathname === '/api/brands') { return Promise.resolve(json(brands)) }
       assert.equal(parsed.pathname, '/api/products')
       const offset = Number(parsed.searchParams.get('offset'))
       const limit = Number(parsed.searchParams.get('limit'))
       return Promise.resolve(json(dataset.slice(offset, offset + limit)))
     }
     writes.push({ url, method: init.method, body: init.body && JSON.parse(init.body) })
-    if (code) return Promise.resolve(json({ detail: code === 409 ? 'Product is referenced by a cart or order' : 'rejected' }, code))
+    if (code) { return Promise.resolve(json({ detail: code === 409 ? 'Product is referenced by a cart or order' : 'rejected' }, code)) }
     const id = Number(parsed.pathname.split('/').at(-1))
     let result
     if (init.method === 'POST') {
@@ -59,7 +59,7 @@ try {
       assert.equal(init.method, 'DELETE'); assert.equal(init.body, undefined)
       dataset = dataset.filter((item) => item.id !== id)
     }
-    if (loseResponse) return Promise.reject(new TypeError('lost response'))
+    if (loseResponse) { return Promise.reject(new TypeError('lost response')) }
     return Promise.resolve(init.method === 'DELETE' ? new Response(null, { status: 204 }) : json(result, init.method === 'POST' ? 201 : 200))
   }
   function setup() {
@@ -128,7 +128,7 @@ try {
   })
   await check('invalid form fields cannot produce a request body', async () => {
     const draft = { name: 'Valid', brandId: '1', price: '10.00', description: '', imageUrl: '' }
-    for (const price of ['0', '-1', '1e2', 'Infinity', '1.234', '100000000.00', '', '.01']) assert.throws(() => productBody({ ...draft, price }, brands))
+    for (const price of ['0', '-1', '1e2', 'Infinity', '1.234', '100000000.00', '', '.01']) { assert.throws(() => productBody({ ...draft, price }, brands)) }
     for (const patch of [{ name: ' ' }, { name: 'a'.repeat(121) }, { brandId: '999' }, { description: 'a'.repeat(2001) }, { imageUrl: 'javascript:alert(1)' }, { imageUrl: 'bad-url' }]) {
       assert.throws(() => productBody({ ...draft, ...patch }, brands))
     }
@@ -182,7 +182,7 @@ try {
   })
   await check('confirmed POST and failed GET keep success separate from refresh error', async () => {
     await fresh(); state.openEditor()
-    handler = async (url, init) => { const result = await defaultHandler(url, init); if (init.method === 'POST') failRefresh = true; return result }
+    handler = async (url, init) => { const result = await defaultHandler(url, init); if (init.method === 'POST') { failRefresh = true; } return result }
     assert.equal(await state.save(body), true); assert.equal(writes.length, 1)
     assert.match((notifications.current?.message ?? ''), /создан/); assert.match(state.error.value, /Запись подтверждена/)
     assert.equal(state.canWrite.value, false); assert.equal(await state.save(body), false)
@@ -247,7 +247,6 @@ try {
   console.log(`Admin product checks: ${passed} passed. No real products or accounts changed.`)
 } finally {
   scope?.stop(); notifications?.$dispose(); auth?.$dispose(); globalThis.fetch = originalFetch
-  if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)
-  else delete globalThis.sessionStorage
+  if (originalStorage) { Object.defineProperty(globalThis, 'sessionStorage', originalStorage) } else { delete globalThis.sessionStorage }
   await server.close()
 }

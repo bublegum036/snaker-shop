@@ -22,7 +22,7 @@ import SessionMessages from '@/components/auth/SessionMessages/SessionMessages.v
   margin-inline: auto;
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .app-container {
     width: calc(100% - 36px);
   }

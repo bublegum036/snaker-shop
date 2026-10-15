@@ -25,8 +25,29 @@ const { order, loading, error, load } = useOrderDetails(() => props.orderId)
 </template>
 
 <style scoped>
-.order-page { max-width: 900px; margin: 64px auto; }
-.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-h1 { margin: 0; font-size: clamp(36px, 5vw, 56px); letter-spacing: -2px; }
-.back-link { display: inline-block; margin-top: 24px; text-decoration: underline; text-underline-offset: 3px; }
+.order-page {
+  max-width: 900px;
+  margin: 64px auto;
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(36px, 5vw, 56px);
+  letter-spacing: -2px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 24px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 </style>

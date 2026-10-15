@@ -58,7 +58,7 @@ export function useAdminProducts() {
   }
 
   async function load(targetPage = page.value) {
-    if (disposed || !isAdmin.value || saving.value || !Number.isInteger(targetPage) || targetPage < 1) return
+    if (disposed || !isAdmin.value || saving.value || !Number.isInteger(targetPage) || targetPage < 1) { return }
     request?.abort()
     const current = new AbortController()
     request = current
@@ -67,8 +67,8 @@ export function useAdminProducts() {
     error.value = ''
     try {
       // Перечитываем роль: список товаров публичный и сам по себе не доказывает доступ.
-      if (accessDenied.value) await auth.refreshProfile()
-      if (current.signal.aborted || !isAdmin.value) return
+      if (accessDenied.value) { await auth.refreshProfile() }
+      if (current.signal.aborted || !isAdmin.value) { return }
       const result = await readPage(targetPage, current.signal)
       if (!current.signal.aborted) {
         applyPage(targetPage, result)
@@ -76,16 +76,15 @@ export function useAdminProducts() {
       }
     } catch (cause) {
       if (!current.signal.aborted) {
-        if (cause instanceof ApiError && cause.status === 403) handleForbidden()
-        else { requiresReload.value = true; error.value = cause instanceof Error ? cause.message : text.loadFailed }
+        if (cause instanceof ApiError && cause.status === 403) { handleForbidden() } else { requiresReload.value = true; error.value = cause instanceof Error ? cause.message : text.loadFailed }
       }
     } finally {
-      if (request === current) loading.value = false
+      if (request === current) { loading.value = false }
     }
   }
 
   function openEditor(product: Product | null = null) {
-    if (!canWrite.value) return
+    if (!canWrite.value) { return }
     deleting.value = null
     editing.value = product
     editorVersion.value++
@@ -94,20 +93,20 @@ export function useAdminProducts() {
   }
 
   function closeEditor() {
-    if (saving.value) return
+    if (saving.value) { return }
     editorOpen.value = false
     editing.value = null
   }
 
   function requestDelete(product: Product) {
-    if (!canWrite.value) return
+    if (!canWrite.value) { return }
     deleting.value = product
   }
 
-  function cancelDelete() { if (!saving.value) deleting.value = null }
+  function cancelDelete() { if (!saving.value) { deleting.value = null } }
 
   async function mutate(action: ProductAction, name: string, write: (signal: AbortSignal) => Promise<unknown>): Promise<boolean> {
-    if (disposed || !canWrite.value) return false
+    if (disposed || !canWrite.value) { return false }
     request?.abort()
     const current = new AbortController()
     request = current
@@ -116,7 +115,7 @@ export function useAdminProducts() {
     error.value = ''
     try {
       await write(current.signal)
-      if (current.signal.aborted || version !== revision) return false
+      if (current.signal.aborted || version !== revision) { return false }
       editorOpen.value = false
       editing.value = deleting.value = null
       notifications.success(text.confirmed(action, name))
@@ -124,7 +123,7 @@ export function useAdminProducts() {
       requestedPage.value = targetPage
       try {
         const result = await readPage(targetPage, current.signal)
-        if (!current.signal.aborted && version === revision) applyPage(targetPage, result)
+        if (!current.signal.aborted && version === revision) { applyPage(targetPage, result) }
       } catch {
         if (!current.signal.aborted && version === revision) {
           products.value = []
@@ -134,7 +133,7 @@ export function useAdminProducts() {
       }
       return !current.signal.aborted && version === revision
     } catch (cause) {
-      if (current.signal.aborted || version !== revision) return false
+      if (current.signal.aborted || version !== revision) { return false }
       if (cause instanceof ApiError) {
         switch (cause.status) {
           case 403: handleForbidden(); return false
@@ -143,19 +142,19 @@ export function useAdminProducts() {
           case 409: error.value = text.conflict(action); break
           default: error.value = text.uncertain
         }
-      } else error.value = text.uncertain
+      } else { error.value = text.uncertain }
       // При потерянном ответе POST мог создать товар: не предлагаем повтор формы.
       requiresReload.value = true
       editorOpen.value = false
       editing.value = deleting.value = null
       return false
     } finally {
-      if (version === revision && request === current) saving.value = false
+      if (version === revision && request === current) { saving.value = false }
     }
   }
 
   async function save(body: ProductWrite) {
-    if (!editorOpen.value) return false
+    if (!editorOpen.value) { return false }
     const product = editing.value
     return mutate(product ? 'update' : 'create', body.name, (signal) => product
       ? updateProduct(auth.authorizedRequest, product.id, body, signal)
@@ -164,7 +163,7 @@ export function useAdminProducts() {
 
   async function confirmDelete() {
     const product = deleting.value
-    if (!product) return false
+    if (!product) { return false }
     return mutate('delete', product.name, (signal) => deleteProduct(auth.authorizedRequest, product.id, signal))
   }
 
@@ -179,7 +178,7 @@ export function useAdminProducts() {
     requiresReload.value = accessDenied.value = false
     page.value = requestedPage.value = 1
     hasNextPage.value = false
-    if (session) void load(1)
+    if (session) { void load(1) }
   }, { immediate: true, flush: 'sync' })
   onScopeDispose(() => { disposed = true; revision++; request?.abort() })
 

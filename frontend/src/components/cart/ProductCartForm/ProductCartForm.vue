@@ -26,11 +26,11 @@ watch([sizeId, () => auth.accessToken], () => {
   error.value = ''
 })
 watch(() => cart.data, (data) => {
-  if (data) error.value = ''
+  if (data) { error.value = '' }
 })
 
 async function add() {
-  if (!canAdd.value || sizeId.value === null) return
+  if (!canAdd.value || sizeId.value === null) { return }
   error.value = ''
   if (typeof quantity.value !== 'number' || !Number.isInteger(quantity.value) || quantity.value < 1 || quantity.value > remaining.value) {
     error.value = text.invalidQuantity

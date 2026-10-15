@@ -38,7 +38,7 @@ export function catalogQueryParams(query: CatalogQuery): URLSearchParams {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(query)) {
     // В частности, цена 0 должна попасть в запрос; пустые поля — нет.
-    if (value !== undefined && value !== '') params.set(key, String(value))
+    if (value !== undefined && value !== '') { params.set(key, String(value)) }
   }
   return params
 }
@@ -53,6 +53,6 @@ export async function getProducts(query: CatalogQuery, signal?: AbortSignal): Pr
 
 export async function getBrands(signal?: AbortSignal): Promise<Brand[]> {
   const response = await fetch('/api/brands', { signal })
-  if (!response.ok) throw new Error(text.brandsFailed(response.status))
+  if (!response.ok) { throw new Error(text.brandsFailed(response.status)) }
   return response.json()
 }

@@ -8,8 +8,8 @@ export function loginReturnQuery(route: Pick<RouteLocationNormalized, 'name' | '
   if (route.name === 'admin-inventory' && isPositiveId(route.params.productId)) {
     return { next: 'admin-inventory', productId: route.params.productId }
   }
-  if (route.name === 'admin-orders') return { next: 'admin-orders' }
-  if (route.name === 'admin-products') return { next: 'admin-products' }
+  if (route.name === 'admin-orders') { return { next: 'admin-orders' } }
+  if (route.name === 'admin-products') { return { next: 'admin-products' } }
   return { next: route.name === 'cart' ? 'cart' : route.name === 'orders' ? 'orders' : 'account' }
 }
 

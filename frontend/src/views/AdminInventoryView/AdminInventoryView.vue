@@ -42,10 +42,39 @@ const sizes = computed(() => [...(product.value?.sizes ?? [])].sort((first, seco
 </template>
 
 <style scoped>
-.inventory-page { max-width: 1000px; margin: 64px auto; }
-.page-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
-h1 { margin: 0; font-size: clamp(32px, 5vw, 52px); letter-spacing: -2px; }
-.product-name { margin-top: 32px; overflow-wrap: anywhere; }
-ul { list-style: none; padding: 0; }
-.back-link { display: inline-block; margin-top: 24px; text-decoration: underline; text-underline-offset: 3px; }
+.inventory-page {
+  max-width: 1000px;
+  margin: 64px auto;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 52px);
+  letter-spacing: -2px;
+}
+
+.product-name {
+  margin-top: 32px;
+  overflow-wrap: anywhere;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 24px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 </style>

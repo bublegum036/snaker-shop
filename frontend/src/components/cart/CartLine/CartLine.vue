@@ -40,7 +40,7 @@ strong {
   white-space: nowrap;
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .cart-line {
     grid-template-columns: 1fr auto;
     gap: 12px;

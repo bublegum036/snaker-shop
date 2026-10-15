@@ -15,20 +15,18 @@ const canSubmit = computed(() => !cart.loading && !cart.mutating && (
 ))
 
 async function requestCheckout() {
-  if (!canSubmit.value) return
-  if (cart.checkoutPending) await submitOrder()
-  else { confirmationTotal.value = formatPrice(cart.data!.estimated_total); confirming.value = true }
+  if (!canSubmit.value) { return }
+  if (cart.checkoutPending) { await submitOrder() } else { confirmationTotal.value = formatPrice(cart.data!.estimated_total); confirming.value = true }
 }
-function cancelCheckout() { if (!cart.mutating) confirming.value = false }
+function cancelCheckout() { if (!cart.mutating) { confirming.value = false } }
 async function submitOrder() {
   submitting.value = true
-  try { await cart.placeOrder() }
-  finally { submitting.value = false; confirming.value = false }
+  try { await cart.placeOrder() } finally { submitting.value = false; confirming.value = false }
 }
 async function confirmCheckout() {
-  if (confirming.value && canSubmit.value) await submitOrder()
+  if (confirming.value && canSubmit.value) { await submitOrder() }
 }
-watch(() => cart.data, (data) => { if (!data && !cart.mutating) confirming.value = false })
+watch(() => cart.data, (data) => { if (!data && !cart.mutating) { confirming.value = false } })
 </script>
 
 <template>
@@ -54,13 +52,31 @@ watch(() => cart.data, (data) => { if (!data && !cart.mutating) confirming.value
 
 <style scoped>
 .checkout-panel { margin-top: 24px; }
-.order-result { margin-top: 24px; padding: 20px; border: 1px solid var(--color-text); }
+
+.order-result {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid var(--color-text);
+}
 h2 { margin-top: 0; }
-.order-link { text-decoration: underline; text-underline-offset: 3px; }
-dl { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
+
+.order-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
 dd { margin: 0; }
-@media (max-width: 480px) {
-  dl { grid-template-columns: 1fr; gap: 6px; }
+
+@media (width <= 480px) {
+  dl {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
   dd { margin-bottom: 12px; }
 }
 </style>

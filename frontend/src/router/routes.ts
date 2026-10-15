@@ -17,8 +17,8 @@ export const routes: RouteRecordRaw[] = [
 ]
 
 export const scrollBehavior: RouterScrollBehavior = (to, from, savedPosition) => {
-  if (savedPosition) return savedPosition
+  if (savedPosition) { return savedPosition }
   // Фильтры/пагинация в query не должны уводить пользователя к шапке.
-  if (to.path === from.path) return false
+  if (to.path === from.path) { return false }
   return { top: 0 }
 }

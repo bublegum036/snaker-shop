@@ -34,7 +34,7 @@ watch(() => props.mode, resetForm)
 onBeforeUnmount(resetForm)
 
 async function submit() {
-  if (disabled.value) return
+  if (disabled.value) { return }
   error.value = ''
   // bcrypt ограничен байтами UTF-8: 72 кириллических символа уже не поместятся.
   if (new TextEncoder().encode(password.value).length > 72 || password.value.includes('\0')) {
@@ -56,11 +56,8 @@ async function submit() {
       await router.replace(loginDestination(route.query))
     }
   } catch (cause) {
-    if (current.signal.aborted) return
-    if (cause instanceof ApiError && cause.status === 401) error.value = text.invalidCredentials
-    else if (cause instanceof ApiError && cause.status === 409) error.value = text.duplicateEmail
-    else if (cause instanceof ApiError && cause.status === 422) error.value = text.invalidInput
-    else error.value = cause instanceof Error ? cause.message : text.requestFailed
+    if (current.signal.aborted) { return }
+    if (cause instanceof ApiError && cause.status === 401) { error.value = text.invalidCredentials } else if (cause instanceof ApiError && cause.status === 409) { error.value = text.duplicateEmail } else if (cause instanceof ApiError && cause.status === 422) { error.value = text.invalidInput } else { error.value = cause instanceof Error ? cause.message : text.requestFailed }
   } finally {
     credentials.password = ''
     if (request === current) {

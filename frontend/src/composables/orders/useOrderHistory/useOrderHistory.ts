@@ -17,7 +17,7 @@ export function useOrderHistory() {
   let disposed = false
 
   async function load(targetPage = page.value) {
-    if (disposed || !auth.isAuthenticated || !Number.isInteger(targetPage) || targetPage < 1) return
+    if (disposed || !auth.isAuthenticated || !Number.isInteger(targetPage) || targetPage < 1) { return }
     request?.abort()
     const current = new AbortController()
     request = current
@@ -29,14 +29,14 @@ export function useOrderHistory() {
       const result = await getOrders(auth.authorizedRequest, {
         limit: PAGE_SIZE + 1, offset: (targetPage - 1) * PAGE_SIZE,
       }, current.signal)
-      if (current.signal.aborted) return
+      if (current.signal.aborted) { return }
       orders.value = result.slice(0, PAGE_SIZE)
       hasNextPage.value = result.length > PAGE_SIZE
       page.value = targetPage
     } catch (cause) {
-      if (!current.signal.aborted) error.value = cause instanceof Error ? cause.message : text.loadFailed
+      if (!current.signal.aborted) { error.value = cause instanceof Error ? cause.message : text.loadFailed }
     } finally {
-      if (request === current) loading.value = false
+      if (request === current) { loading.value = false }
     }
   }
 
@@ -47,7 +47,7 @@ export function useOrderHistory() {
     loading.value = false
     page.value = requestedPage.value = 1
     hasNextPage.value = false
-    if (session) void load(1)
+    if (session) { void load(1) }
   }, { immediate: true, flush: 'sync' })
 
   onScopeDispose(() => { disposed = true; request?.abort() })

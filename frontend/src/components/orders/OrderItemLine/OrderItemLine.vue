@@ -24,11 +24,20 @@ defineProps<{ item: OrderItem; index: number }>()
 
 <style scoped>
 h3 { margin-top: 0; }
-dl { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
+
+dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
 dt { color: var(--color-muted); }
 dd { margin: 0; }
-@media (max-width: 480px) {
-  dl { grid-template-columns: 1fr; gap: 6px; }
+
+@media (width <= 480px) {
+  dl {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
   dd { margin-bottom: 10px; }
 }
 </style>

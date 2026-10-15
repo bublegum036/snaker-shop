@@ -11,10 +11,9 @@ const draft = reactive(productDraft(props.product))
 const error = ref('')
 
 function submit() {
-  if (props.disabled) return
+  if (props.disabled) { return }
   error.value = ''
-  try { emit('save', productBody(draft, props.brands)) }
-  catch (cause) { error.value = cause instanceof Error ? cause.message : text.priceInvalid }
+  try { emit('save', productBody(draft, props.brands)) } catch (cause) { error.value = cause instanceof Error ? cause.message : text.priceInvalid }
 }
 </script>
 
@@ -43,12 +42,48 @@ function submit() {
 </template>
 
 <style scoped>
-.product-editor { margin-block: 24px; padding: 24px; border: 1px solid var(--color-border); }
+.product-editor {
+  margin-block: 24px;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+}
 h2 { margin-top: 0; }
-fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
-label { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; font-size: 14px; }
-textarea { width: 100%; padding: 12px; border: 1px solid var(--color-border); background: var(--color-background); color: inherit; font: inherit; resize: vertical; }
-textarea:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-.form-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-@media (max-width: 480px) { .product-editor { padding: 16px; } }
+
+fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+
+textarea:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (width <= 480px) { .product-editor { padding: 16px; } }
 </style>

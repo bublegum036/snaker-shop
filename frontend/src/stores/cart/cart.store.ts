@@ -58,7 +58,7 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   async function loadCart() {
-    if (!auth.isAuthenticated || mutating.value) return
+    if (!auth.isAuthenticated || mutating.value) { return }
     readRequest?.abort()
     const request = new AbortController()
     readRequest = request
@@ -68,19 +68,19 @@ export const useCartStore = defineStore('cart', () => {
     error.value = ''
     try {
       const result = await getCart(auth.authorizedRequest, request.signal)
-      if (version === revision && !request.signal.aborted) data.value = result
+      if (version === revision && !request.signal.aborted) { data.value = result }
     } catch (cause) {
       if (version === revision && !request.signal.aborted) {
         error.value = cause instanceof Error ? cause.message : text.loadFailed
       }
     } finally {
-      if (version === revision && readRequest === request) loading.value = false
+      if (version === revision && readRequest === request) { loading.value = false }
     }
   }
 
   async function mutateCart(action: CartAction, write: (signal: AbortSignal) => Promise<unknown>): Promise<boolean> {
-    if (!auth.isAuthenticated) throw new Error(text.loginRequired)
-    if (mutating.value || loading.value || checkoutPending.value || !data.value || error.value) return false
+    if (!auth.isAuthenticated) { throw new Error(text.loginRequired) }
+    if (mutating.value || loading.value || checkoutPending.value || !data.value || error.value) { return false }
     readRequest?.abort()
     const request = new AbortController()
     writeRequest = request
@@ -88,7 +88,7 @@ export const useCartStore = defineStore('cart', () => {
     mutating.value = true
     try {
       await write(request.signal)
-      if (version !== revision || request.signal.aborted) return false
+      if (version !== revision || request.signal.aborted) { return false }
       // Запись подтверждена. Ошибка последующего GET не означает ошибку записи.
       try {
         const result = await getCart(auth.authorizedRequest, request.signal)
@@ -101,20 +101,20 @@ export const useCartStore = defineStore('cart', () => {
           error.value = text.refreshAfterWriteFailed(action)
         }
       }
-      if (version === revision && !request.signal.aborted) notifications.success(text.confirmed(action))
+      if (version === revision && !request.signal.aborted) { notifications.success(text.confirmed(action)) }
       return version === revision && !request.signal.aborted
     } catch (cause) {
-      if (version !== revision || request.signal.aborted) return false
+      if (version !== revision || request.signal.aborted) { return false }
       data.value = null
       error.value = getMutationErrorMessage(cause, action)
-      throw new Error(error.value)
+      throw new Error(error.value, { cause })
     } finally {
-      if (version === revision) mutating.value = false
+      if (version === revision) { mutating.value = false }
     }
   }
 
   function requirePositiveInteger(value: number, message: string) {
-    if (!Number.isInteger(value) || value <= 0 || value > 2147483647) throw new Error(message)
+    if (!Number.isInteger(value) || value <= 0 || value > 2147483647) { throw new Error(message) }
   }
 
   async function addItem(sizeId: number, quantity: number): Promise<boolean> {
@@ -150,15 +150,15 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   async function placeOrder(): Promise<boolean> {
-    if (!auth.isAuthenticated || mutating.value || loading.value) return false
+    if (!auth.isAuthenticated || mutating.value || loading.value) { return false }
     // Повтор с сохранённым ключом допустим даже при уже пустой корзине.
-    if (!pendingKey.value && (!data.value?.items.length || error.value)) return false
+    if (!pendingKey.value && (!data.value?.items.length || error.value)) { return false }
     const storageKey = checkoutStorageKey()
     checkoutError.value = ''
     try {
       const key = pendingKey.value ?? sessionStorage.getItem(storageKey) ?? crypto.randomUUID()
       sessionStorage.setItem(storageKey, key)
-      if (sessionStorage.getItem(storageKey) !== key) throw new Error(checkoutTexts.storageUnavailable)
+      if (sessionStorage.getItem(storageKey) !== key) { throw new Error(checkoutTexts.storageUnavailable) }
       pendingKey.value = key
     } catch {
       checkoutError.value = checkoutTexts.storageUnavailable
@@ -172,7 +172,7 @@ export const useCartStore = defineStore('cart', () => {
     order.value = null
     try {
       const result = await checkoutRequest(auth.authorizedRequest, key, request.signal)
-      if (version !== revision || request.signal.aborted) return false
+      if (version !== revision || request.signal.aborted) { return false }
       order.value = result
       clearCheckoutKey(storageKey)
       // POST уже подтверждён; не превращаем сбой чтения в повторную покупку.
@@ -180,26 +180,26 @@ export const useCartStore = defineStore('cart', () => {
       error.value = ''
       try {
         const result = await getCart(auth.authorizedRequest, request.signal)
-        if (version === revision && !request.signal.aborted) data.value = result
+        if (version === revision && !request.signal.aborted) { data.value = result }
       } catch {
-        if (version === revision && !request.signal.aborted) error.value = checkoutTexts.refreshFailed
+        if (version === revision && !request.signal.aborted) { error.value = checkoutTexts.refreshFailed }
       }
-      if (version === revision && !request.signal.aborted) notifications.success(checkoutTexts.confirmed(result.id))
+      if (version === revision && !request.signal.aborted) { notifications.success(checkoutTexts.confirmed(result.id)) }
       return version === revision && !request.signal.aborted
     } catch (cause) {
-      if (version !== revision || request.signal.aborted) return false
+      if (version !== revision || request.signal.aborted) { return false }
       // Только однозначный отказ 4xx позволяет начать новое оформление.
       if (cause instanceof ApiError && cause.status >= 400 && cause.status < 500 && cause.status !== 401) {
         const cleared = clearCheckoutKey(storageKey)
         data.value = null
         error.value = checkoutTexts.rejected
-        if (cleared) checkoutError.value = checkoutTexts.errors[cause.code ?? ''] ?? checkoutTexts.rejected
+        if (cleared) { checkoutError.value = checkoutTexts.errors[cause.code ?? ''] ?? checkoutTexts.rejected }
       } else {
         checkoutError.value = checkoutTexts.uncertain
       }
       return false
     } finally {
-      if (version === revision) mutating.value = false
+      if (version === revision) { mutating.value = false }
     }
   }
 
@@ -207,8 +207,7 @@ export const useCartStore = defineStore('cart', () => {
   watch(() => auth.isAuthenticated ? `${auth.user!.id}:${auth.accessToken}` : null, (token) => {
     reset()
     if (token) {
-      try { pendingKey.value = sessionStorage.getItem(checkoutStorageKey()) }
-      catch { checkoutError.value = checkoutTexts.storageUnavailable }
+      try { pendingKey.value = sessionStorage.getItem(checkoutStorageKey()) } catch { checkoutError.value = checkoutTexts.storageUnavailable }
       void loadCart()
     }
   }, { immediate: true, flush: 'sync' })

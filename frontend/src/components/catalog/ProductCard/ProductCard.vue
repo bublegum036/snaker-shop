@@ -121,7 +121,7 @@ h3 {
   margin-bottom: 0;
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .product-visual {
     aspect-ratio: 1.2;
   }

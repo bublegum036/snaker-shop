@@ -19,7 +19,7 @@ try {
   globalThis.clearTimeout = (id) => timers.delete(id)
   function advance(milliseconds) {
     now += milliseconds
-    for (const [id, timer] of [...timers]) if (timer.at <= now) { timers.delete(id); timer.callback() }
+    for (const [id, timer] of [...timers]) { if (timer.at <= now) { timers.delete(id); timer.callback() } }
   }
   function fresh() {
     notifications?.$dispose(); auth?.$dispose(); timers.clear(); now = 0
@@ -71,7 +71,6 @@ try {
 } finally {
   notifications?.$dispose(); auth?.$dispose()
   globalThis.setTimeout = originalSetTimeout; globalThis.clearTimeout = originalClearTimeout
-  if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)
-  else delete globalThis.sessionStorage
+  if (originalStorage) { Object.defineProperty(globalThis, 'sessionStorage', originalStorage) } else { delete globalThis.sessionStorage }
   await server.close()
 }

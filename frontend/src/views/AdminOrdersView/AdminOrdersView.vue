@@ -40,12 +40,56 @@ const { orders, status, page, requestedPage, hasNextPage, loading, error, isAdmi
 </template>
 
 <style scoped>
-.admin-orders { max-width: 1000px; margin: 64px auto; }
-.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-h1 { margin: 0; font-size: clamp(32px, 5vw, 52px); letter-spacing: -2px; }
-.status-filter { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-block: 24px; }
-ul { list-style: none; padding: 0; }
-li { padding-block: 24px; border-bottom: 1px solid var(--color-border); }
-.details-link { display: inline-block; margin-top: 24px; text-decoration: underline; text-underline-offset: 3px; }
-.pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.admin-orders {
+  max-width: 1000px;
+  margin: 64px auto;
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 52px);
+  letter-spacing: -2px;
+}
+
+.status-filter {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-block: 24px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding-block: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.details-link {
+  display: inline-block;
+  margin-top: 24px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
 </style>

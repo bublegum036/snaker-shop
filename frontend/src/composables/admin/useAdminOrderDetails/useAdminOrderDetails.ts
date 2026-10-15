@@ -27,7 +27,7 @@ export function useAdminOrderDetails(orderId: () => string) {
 
   function forbidden() { order.value = null; accessDenied.value = true; error.value = text.forbidden }
   async function load() {
-    if (disposed || !isAdmin.value || saving.value) return
+    if (disposed || !isAdmin.value || saving.value) { return }
     request?.abort()
     error.value = ''
     const id = orderId()
@@ -36,25 +36,24 @@ export function useAdminOrderDetails(orderId: () => string) {
     request = current
     loading.value = true
     try {
-      if (accessDenied.value) await auth.refreshProfile()
-      if (current.signal.aborted || !isAdmin.value) return
+      if (accessDenied.value) { await auth.refreshProfile() }
+      if (current.signal.aborted || !isAdmin.value) { return }
       const result = await getAdminOrder(auth.authorizedRequest, id, current.signal)
       if (!current.signal.aborted) { order.value = result; requiresReload.value = accessDenied.value = false }
     } catch (cause) {
       if (!current.signal.aborted) {
         requiresReload.value = true
-        if (cause instanceof ApiError && cause.status === 403) forbidden()
-        else {
-          if (cause instanceof ApiError && cause.status === 404) order.value = null
+        if (cause instanceof ApiError && cause.status === 403) { forbidden() } else {
+          if (cause instanceof ApiError && cause.status === 404) { order.value = null }
           error.value = cause instanceof ApiError && cause.status === 404 ? text.missing : cause instanceof Error ? cause.message : text.loadFailed
         }
       }
-    } finally { if (request === current) loading.value = false }
+    } finally { if (request === current) { loading.value = false } }
   }
-  function requestChange() { if (canChange.value) confirming.value = true }
-  function cancelChange() { if (!saving.value) confirming.value = false }
+  function requestChange() { if (canChange.value) { confirming.value = true } }
+  function cancelChange() { if (!saving.value) { confirming.value = false } }
   async function confirmChange(): Promise<boolean> {
-    if (!confirming.value || !canChange.value || !order.value || !nextStatus.value) return false
+    if (!confirming.value || !canChange.value || !order.value || !nextStatus.value) { return false }
     const id = order.value.id
     const status = nextStatus.value
     const version = revision
@@ -65,17 +64,18 @@ export function useAdminOrderDetails(orderId: () => string) {
     error.value = ''
     try {
       const result = await updateOrderStatus(auth.authorizedRequest, id, status, current.signal)
-      if (version !== revision || current.signal.aborted) return false
+      if (version !== revision || current.signal.aborted) { return false }
       order.value = result
       notifications.success(text.confirmed(id))
       return true
     } catch (cause) {
-      if (version !== revision || current.signal.aborted) return false
+      if (version !== revision || current.signal.aborted) { return false }
       requiresReload.value = true
-      if (cause instanceof ApiError && cause.status === 403) forbidden()
-      else error.value = cause instanceof ApiError && cause.status === 409 ? text.conflict
+      if (cause instanceof ApiError && cause.status === 403) { forbidden() } else {
+ error.value = cause instanceof ApiError && cause.status === 409 ? text.conflict
         : cause instanceof ApiError && cause.status === 404 ? text.missing
         : cause instanceof ApiError && cause.status === 422 ? text.invalidInput : text.uncertain
+}
       return false
     } finally {
       if (version === revision) { saving.value = false; confirming.value = false }
@@ -87,7 +87,7 @@ export function useAdminOrderDetails(orderId: () => string) {
     order.value = null
     loading.value = saving.value = confirming.value = requiresReload.value = accessDenied.value = false
     error.value = ''
-    if (isAdmin.value) void load()
+    if (isAdmin.value) { void load() }
   }, { immediate: true, flush: 'sync' })
   onScopeDispose(() => { disposed = true; revision++; request?.abort() })
   return { order, loading, saving, error, busy, isAdmin, nextStatus, canChange, confirming, load, requestChange, cancelChange, confirmChange }

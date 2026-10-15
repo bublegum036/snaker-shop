@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
   },
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,14 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
+    "lint": "run-p lint:eslint lint:styles",
+    "lint:eslint": "eslint . --max-warnings 0",
+    "lint:styles": "stylelint \"src/**/*.{css,vue}\" --max-warnings 0",
+    "lint:fix": "run-s lint:eslint:fix lint:styles:fix",
+    "lint:eslint:fix": "npm run lint:eslint -- --fix",
+    "lint:styles:fix": "npm run lint:styles -- --fix",
+    "check": "run-s lint build check:scenarios",
+    "check:scenarios": "run-s check:auth check:cart check:checkout check:orders check:admin-products check:notifications check:admin-inventory check:admin-orders check:router",
     "check:auth": "node scripts/check-auth.mjs",
     "check:cart": "node scripts/check-cart.mjs",
     "check:checkout": "node scripts/check-checkout.mjs",
@@ -28,12 +36,21 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@tsconfig/node22": "^22.0.2",
     "@types/node": "^22.16.5",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
+    "eslint": "^10.12.0",
+    "eslint-plugin-vue": "^10.11.1",
+    "globals": "^17.13.0",
     "npm-run-all2": "^8.0.4",
+    "postcss-html": "^2.0.0",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard": "^40.0.0",
     "typescript": "~5.8.0",
+    "typescript-eslint": "^8.71.2",
     "vite": "^8.3.4",
     "vue-tsc": "^3.0.4"
   }

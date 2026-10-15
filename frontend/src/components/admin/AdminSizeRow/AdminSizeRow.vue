@@ -21,9 +21,27 @@ const emit = defineEmits<{ edit: []; remove: [] }>()
 </template>
 
 <style scoped>
-.size-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; padding-block: 20px; border-bottom: 1px solid var(--color-border); }
-h2 { margin: 0; font-size: 22px; }
+.size-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding-block: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+h2 {
+  margin: 0;
+  font-size: 22px;
+}
 p { margin-bottom: 0; }
-.row-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
 .remove-button { color: var(--color-error); }
 </style>

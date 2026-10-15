@@ -16,7 +16,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
   let timer: ReturnType<typeof setTimeout> | undefined
 
   function dismiss(id = current.value?.id) {
-    if (id !== current.value?.id) return
+    if (id !== current.value?.id) { return }
     clearTimeout(timer)
     timer = undefined
     current.value = null

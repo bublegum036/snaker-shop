@@ -23,12 +23,12 @@ try {
   const { sizeBody, sizeDraft } = await server.ssrLoadModule('/src/components/admin/AdminSizeForm/AdminSizeForm.model.ts')
   const { loginDestination, loginReturnQuery } = await server.ssrLoadModule('/src/router/auth-redirect.ts')
   function defaultHandler(url, init) {
-    if (url === '/api/auth/login') return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' }))
-    if (url === '/api/auth/me') return Promise.resolve(json(user))
+    if (url === '/api/auth/login') { return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' })) }
+    if (url === '/api/auth/me') { return Promise.resolve(json(user)) }
     assert.equal(init.headers.get('Authorization'), 'Bearer fixture-token')
     if (!init.method) {
       reads.push(url)
-      if (failRead) return Promise.reject(new TypeError('offline'))
+      if (failRead) { return Promise.reject(new TypeError('offline')) }
       const product = dataset.find((value) => `/api/products/${value.id}` === url)
       return Promise.resolve(product ? json(product) : json({ detail: 'Product not found' }, 404))
     }
@@ -37,20 +37,19 @@ try {
     const product = dataset.find((value) => value.id === Number(path[1]))
     const body = init.body && JSON.parse(init.body)
     writes.push({ url, method: init.method, body })
-    if (failure) return Promise.resolve(json({ detail: failure.code }, failure.status))
-    if (!product) return Promise.resolve(json({ detail: 'product_not_found' }, 404))
+    if (failure) { return Promise.resolve(json({ detail: failure.code }, failure.status)) }
+    if (!product) { return Promise.resolve(json({ detail: 'product_not_found' }, 404)) }
     let result
     if (init.method === 'POST') {
       assert.deepEqual(Object.keys(body).sort(), ['size', 'stock'])
-      if (product.sizes.some((size) => Number(size.size) === Number(body.size))) return Promise.resolve(json({ detail: 'size_already_exists' }, 409))
+      if (product.sizes.some((size) => Number(size.size) === Number(body.size))) { return Promise.resolve(json({ detail: 'size_already_exists' }, 409)) }
       result = { id: 102, ...body }; product.sizes.push(result)
     } else {
       const existing = product.sizes.find((value) => value.id === Number(path[2]))
-      if (!existing) return Promise.resolve(json({ detail: 'size_not_found' }, 404))
-      if (init.method === 'PATCH') { Object.assign(existing, body); result = existing }
-      else { assert.equal(init.method, 'DELETE'); assert.equal(init.body, undefined); product.sizes = product.sizes.filter((value) => value !== existing) }
+      if (!existing) { return Promise.resolve(json({ detail: 'size_not_found' }, 404)) }
+      if (init.method === 'PATCH') { Object.assign(existing, body); result = existing } else { assert.equal(init.method, 'DELETE'); assert.equal(init.body, undefined); product.sizes = product.sizes.filter((value) => value !== existing) }
     }
-    if (loseResponse) return Promise.reject(new TypeError('response lost'))
+    if (loseResponse) { return Promise.reject(new TypeError('response lost')) }
     return Promise.resolve(init.method === 'DELETE' ? new Response(null, { status: 204 }) : json(result, init.method === 'POST' ? 201 : 200))
   }
   function setup() {
@@ -77,8 +76,8 @@ try {
     assert.deepEqual(sizeDraft(null), { size: '', stock: 0 })
   })
   await check('invalid size and stock cannot produce a body', () => {
-    for (const size of ['0', '-1', '999.1', '1000', '42.12', '1e2', 'Infinity', '', '.5']) assert.throws(() => sizeBody({ size, stock: 0 }))
-    for (const stock of [-1, 1.5, 2147483648, NaN, Infinity, '', '2']) assert.throws(() => sizeBody({ size: '42', stock }))
+    for (const size of ['0', '-1', '999.1', '1000', '42.12', '1e2', 'Infinity', '', '.5']) { assert.throws(() => sizeBody({ size, stock: 0 })) }
+    for (const stock of [-1, 1.5, 2147483648, NaN, Infinity, '', '2']) { assert.throws(() => sizeBody({ size: '42', stock })) }
   })
   await check('add size sends product scoped POST and refreshes authoritative data', async () => {
     await fresh(); state.openEditor(); assert.equal(await state.save({ size: '43.0', stock: 0 }), true)
@@ -147,7 +146,7 @@ try {
   })
   await check('confirmed write with failed refresh retains success and blocks new writes', async () => {
     await fresh(); state.openEditor()
-    handler = async (url, init) => { const result = await defaultHandler(url, init); if (init.method === 'POST') failRead = true; return result }
+    handler = async (url, init) => { const result = await defaultHandler(url, init); if (init.method === 'POST') { failRead = true; } return result }
     assert.equal(await state.save({ size: '43.0', stock: 1 }), true)
     assert.match(notifications.current.message, /добавлен/); assert.match(state.error.value, /Запись подтверждена/)
     assert.equal(state.product.value, null); assert.equal(state.canWrite.value, false)
@@ -194,12 +193,11 @@ try {
   await check('login restores only inventory routes with valid product ids', () => {
     assert.deepEqual(loginReturnQuery({ name: 'admin-inventory', params: { productId: '10' } }), { next: 'admin-inventory', productId: '10' })
     assert.deepEqual(loginDestination({ next: 'admin-inventory', productId: '10' }), { name: 'admin-inventory', params: { productId: '10' } })
-    for (const value of ['../10', '0', ['10']]) assert.deepEqual(loginDestination({ next: 'admin-inventory', productId: value }), { name: 'account' })
+    for (const value of ['../10', '0', ['10']]) { assert.deepEqual(loginDestination({ next: 'admin-inventory', productId: value }), { name: 'account' }) }
   })
   console.log(`Admin inventory checks: ${passed} passed. No real products or stock changes.`)
 } finally {
   scope?.stop(); notifications?.$dispose(); auth?.$dispose(); globalThis.fetch = originalFetch
-  if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)
-  else delete globalThis.sessionStorage
+  if (originalStorage) { Object.defineProperty(globalThis, 'sessionStorage', originalStorage) } else { delete globalThis.sessionStorage }
   await server.close()
 }

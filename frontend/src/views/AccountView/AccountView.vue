@@ -17,9 +17,8 @@ async function refresh() {
   const token = auth.accessToken
   try {
     await auth.refreshProfile()
-    if (auth.isAuthenticated && auth.accessToken === token) notifications.success(text.refreshed)
-  }
-  catch (cause) {
+    if (auth.isAuthenticated && auth.accessToken === token) { notifications.success(text.refreshed) }
+  } catch (cause) {
     error.value = cause instanceof Error ? cause.message : text.refreshFailed
   } finally { loading.value = false }
 }

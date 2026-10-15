@@ -19,12 +19,33 @@ defineProps<{ order: Order }>()
 </template>
 
 <style scoped>
-h2 { margin: 0 0 20px; font-size: 24px; }
-dl { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin: 0; }
+h2 {
+  margin: 0 0 20px;
+  font-size: 24px;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin: 0;
+}
 dt { color: var(--color-muted); }
-dd { margin: 0; text-align: right; }
-@media (max-width: 480px) {
-  dl { grid-template-columns: 1fr; gap: 6px; }
-  dd { text-align: left; margin-bottom: 10px; }
+
+dd {
+  margin: 0;
+  text-align: right;
+}
+
+@media (width <= 480px) {
+  dl {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  dd {
+    text-align: left;
+    margin-bottom: 10px;
+  }
 }
 </style>

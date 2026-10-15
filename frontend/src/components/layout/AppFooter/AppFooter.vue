@@ -21,7 +21,7 @@ import { appFooterTexts as text } from './AppFooter.texts'
   color: var(--color-muted);
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .site-footer {
     margin-top: 45px;
     gap: 20px;

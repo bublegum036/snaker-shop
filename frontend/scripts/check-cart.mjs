@@ -22,21 +22,20 @@ try {
   const { useNotificationsStore } = await server.ssrLoadModule('/src/stores/notifications/notifications.store.ts')
   const { useCartStore } = await server.ssrLoadModule('/src/stores/cart/cart.store.ts')
   function defaultHandler(url, init) {
-    if (url === '/api/auth/login') return Promise.resolve(json({ access_token: 'fixture-not-a-jwt', token_type: 'bearer' }))
-    if (url === '/api/auth/me') return Promise.resolve(json(profile))
+    if (url === '/api/auth/login') { return Promise.resolve(json({ access_token: 'fixture-not-a-jwt', token_type: 'bearer' })) }
+    if (url === '/api/auth/me') { return Promise.resolve(json(profile)) }
     assert.ok(init.headers.get('Authorization')?.startsWith('Bearer '))
-    if (url === '/api/cart') return Promise.resolve(json(apiCart))
+    if (url === '/api/cart') { return Promise.resolve(json(apiCart)) }
     const itemPath = url.match(/^\/api\/cart\/items\/(\d+)$/)
     if (itemPath) {
       lastItemId = Number(itemPath[1])
       const item = apiCart.items.find((item) => item.id === lastItemId)
-      if (init.method === 'PATCH') patches++
-      else { assert.equal(init.method, 'DELETE'); deletes++ }
-      if (!item) return Promise.resolve(json({ detail: 'cart_item_not_found' }, 404))
+      if (init.method === 'PATCH') { patches++ } else { assert.equal(init.method, 'DELETE'); deletes++ }
+      if (!item) { return Promise.resolve(json({ detail: 'cart_item_not_found' }, 404)) }
       if (init.method === 'PATCH') {
         lastBody = JSON.parse(init.body)
         assert.deepEqual(Object.keys(lastBody), ['quantity'])
-        if (lastBody.quantity > item.stock) return Promise.resolve(json({ detail: 'insufficient_stock' }, 409))
+        if (lastBody.quantity > item.stock) { return Promise.resolve(json({ detail: 'insufficient_stock' }, 409)) }
         apiCart.items = apiCart.items.map((current) => current.id === item.id
           ? { ...current, quantity: lastBody.quantity, subtotal: `${lastBody.quantity * 5000}.00` } : current)
       } else {
@@ -54,7 +53,7 @@ try {
     assert.equal(lastBody.product_size_id, 302)
     assert.deepEqual(Object.keys(lastBody).sort(), ['product_size_id', 'quantity'])
     const quantity = (apiCart.items[0]?.quantity ?? 0) + lastBody.quantity
-    if (quantity > row.stock) return Promise.resolve(json({ detail: 'insufficient_stock' }, 409))
+    if (quantity > row.stock) { return Promise.resolve(json({ detail: 'insufficient_stock' }, 409)) }
     const item = { ...row, quantity, subtotal: `${quantity * 5000}.00` }
     apiCart = { items: [item], estimated_total: item.subtotal }
     return Promise.resolve(json(item))
@@ -111,7 +110,7 @@ try {
 
   await check('invalid quantities never reach server', async () => {
     const { cart } = await signedIn()
-    for (const quantity of [0, -1, 1.5, NaN]) await assert.rejects(cart.addItem(302, quantity))
+    for (const quantity of [0, -1, 1.5, NaN]) { await assert.rejects(cart.addItem(302, quantity)) }
     assert.equal(posts, 0)
   })
 
@@ -170,7 +169,7 @@ try {
     const { cart } = await signedIn()
     handler = async (url, init) => {
       const result = await defaultHandler(url, init)
-      if (url === '/api/cart/items') throw new TypeError('fixture connection lost after write')
+      if (url === '/api/cart/items') { throw new TypeError('fixture connection lost after write') }
       return result
     }
     await assert.rejects(cart.addItem(302, 1), /Не удалось подтвердить/)
@@ -303,7 +302,7 @@ try {
     await cart.addItem(302, 1)
     handler = async (url, init) => {
       const result = await defaultHandler(url, init)
-      if (init.method === 'PATCH') throw new TypeError('fixture lost PATCH response')
+      if (init.method === 'PATCH') { throw new TypeError('fixture lost PATCH response') }
       return result
     }
     await assert.rejects(cart.updateItem(row.id, 2), /Не удалось подтвердить изменение/)
@@ -351,7 +350,6 @@ try {
   previous?.notifications.$dispose(); previous?.cart.$dispose()
   previous?.auth.$dispose()
   globalThis.fetch = originalFetch
-  if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)
-  else delete globalThis.sessionStorage
+  if (originalStorage) { Object.defineProperty(globalThis, 'sessionStorage', originalStorage) } else { delete globalThis.sessionStorage }
   await server.close()
 }

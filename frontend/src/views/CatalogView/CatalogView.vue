@@ -34,7 +34,7 @@ async function loadProducts(targetPage = page.value) {
       limit: pageSize.value + 1,
       offset: (targetPage - 1) * pageSize.value,
     }, request.signal)
-    if (request.signal.aborted) return
+    if (request.signal.aborted) { return }
     hasNextPage.value = result.length > pageSize.value
     products.value = result.slice(0, pageSize.value)
     page.value = targetPage
@@ -45,7 +45,7 @@ async function loadProducts(targetPage = page.value) {
         : cause instanceof Error ? cause.message : text.loadError
     }
   } finally {
-    if (productRequest === request) loading.value = false
+    if (productRequest === request) { loading.value = false }
   }
 }
 
@@ -57,11 +57,11 @@ async function loadBrands() {
   brandsError.value = ''
   try {
     const result = await getBrands(request.signal)
-    if (!request.signal.aborted) brands.value = result
+    if (!request.signal.aborted) { brands.value = result }
   } catch {
-    if (!request.signal.aborted) brandsError.value = text.brandsError
+    if (!request.signal.aborted) { brandsError.value = text.brandsError }
   } finally {
-    if (brandRequest === request) brandsLoading.value = false
+    if (brandRequest === request) { brandsLoading.value = false }
   }
 }
 
@@ -210,13 +210,13 @@ h2 span {
   background: transparent;
 }
 
-@media (max-width: 1000px) {
+@media (width <= 1000px) {
   .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .catalog-intro {
     padding: 42px 0 32px;
   }

@@ -39,7 +39,7 @@ try {
     return useAuthStore()
   }
   function success(url, init) {
-    if (url === '/api/auth/login') return Promise.resolve(json({ access_token: fixtureToken, token_type: 'bearer' }))
+    if (url === '/api/auth/login') { return Promise.resolve(json({ access_token: fixtureToken, token_type: 'bearer' })) }
     assert.equal(init.headers.get('Authorization'), `Bearer ${fixtureToken}`)
     return Promise.resolve(json(profile))
   }
@@ -232,7 +232,6 @@ try {
   console.log(`Auth checks: ${passed} passed. No real accounts or database changes.`)
 } finally {
   globalThis.fetch = originalFetch
-  if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)
-  else delete globalThis.sessionStorage
+  if (originalStorage) { Object.defineProperty(globalThis, 'sessionStorage', originalStorage) } else { delete globalThis.sessionStorage }
   await server.close()
 }

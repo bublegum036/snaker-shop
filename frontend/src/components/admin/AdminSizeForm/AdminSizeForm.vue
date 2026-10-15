@@ -12,10 +12,9 @@ const error = ref('')
 const unchanged = computed(() => !!props.size && Number(draft.size.replace(',', '.')) === Number(props.size.size) && draft.stock === props.size.stock)
 
 function submit() {
-  if (props.disabled || unchanged.value) return
+  if (props.disabled || unchanged.value) { return }
   error.value = ''
-  try { emit('save', sizeBody(draft)) }
-  catch (cause) { error.value = cause instanceof Error ? cause.message : text.invalidSize }
+  try { emit('save', sizeBody(draft)) } catch (cause) { error.value = cause instanceof Error ? cause.message : text.invalidSize }
 }
 </script>
 
@@ -36,9 +35,31 @@ function submit() {
 </template>
 
 <style scoped>
-.size-editor { margin-block: 24px; padding: 24px; border: 1px solid var(--color-border); }
+.size-editor {
+  margin-block: 24px;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+}
 h2 { margin-top: 0; }
-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
-label { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; font-size: 14px; }
-.form-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 </style>

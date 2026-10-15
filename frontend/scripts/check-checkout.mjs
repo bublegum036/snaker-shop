@@ -25,22 +25,22 @@ try {
   const { useNotificationsStore } = await server.ssrLoadModule('/src/stores/notifications/notifications.store.ts')
   const { useCartStore } = await server.ssrLoadModule('/src/stores/cart/cart.store.ts')
   function defaultHandler(url, init) {
-    if (url === '/api/auth/login') return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' }))
-    if (url === '/api/auth/me') return Promise.resolve(json(user))
+    if (url === '/api/auth/login') { return Promise.resolve(json({ access_token: 'fixture-token', token_type: 'bearer' })) }
+    if (url === '/api/auth/me') { return Promise.resolve(json(user)) }
     assert.ok(init.headers.get('Authorization'))
-    if (url === '/api/cart') return failRead ? Promise.reject(new TypeError('offline')) : Promise.resolve(json(apiCart))
+    if (url === '/api/cart') { return failRead ? Promise.reject(new TypeError('offline')) : Promise.resolve(json(apiCart)) }
     assert.equal(url, '/api/orders')
     assert.equal(init.method, 'POST')
     assert.deepEqual(JSON.parse(init.body), {})
     const key = init.headers.get('Idempotency-Key')
     assert.match(key, /^[0-9a-f-]{36}$/)
     keys.push(key)
-    if (rejectOrders) return Promise.resolve(json({ detail: rejectOrders }, 409))
+    if (rejectOrders) { return Promise.resolve(json({ detail: rejectOrders }, 409)) }
     if (!records.has(key)) {
       records.set(key, { ...order, user_id: user.id })
       apiCart = { items: [], estimated_total: '0.00' }
     }
-    if (loseResponse) return Promise.reject(new TypeError('response lost'))
+    if (loseResponse) { return Promise.reject(new TypeError('response lost')) }
     return Promise.resolve(json(records.get(key), 201))
   }
   function setup(clear = true) {
@@ -163,7 +163,6 @@ try {
 } finally {
   pair?.notifications.$dispose(); pair?.cart.$dispose(); pair?.auth.$dispose()
   globalThis.fetch = originalFetch
-  if (originalStorage) Object.defineProperty(globalThis, 'sessionStorage', originalStorage)
-  else delete globalThis.sessionStorage
+  if (originalStorage) { Object.defineProperty(globalThis, 'sessionStorage', originalStorage) } else { delete globalThis.sessionStorage }
   await server.close()
 }
