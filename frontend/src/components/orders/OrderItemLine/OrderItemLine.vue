@@ -23,7 +23,10 @@ defineProps<{ item: OrderItem; index: number }>()
 </template>
 
 <style scoped>
-h3 { margin-top: 0; }
+h3 {
+  margin-top: 0;
+  overflow-wrap: anywhere;
+}
 
 dl {
   display: grid;

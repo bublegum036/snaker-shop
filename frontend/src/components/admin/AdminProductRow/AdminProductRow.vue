@@ -42,7 +42,16 @@ h2 {
   font-size: 22px;
   overflow-wrap: anywhere;
 }
-p { margin-bottom: 0; }
+
+.product-row > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+p {
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+}
 
 .row-actions {
   display: flex;

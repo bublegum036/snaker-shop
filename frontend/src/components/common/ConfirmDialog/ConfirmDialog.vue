@@ -68,6 +68,7 @@ dialog {
 dialog::backdrop { background: #17201bb3; }
 
 h2 {
+  overflow-wrap: anywhere;
   margin: 0 0 20px;
   font-size: 24px;
 }
@@ -90,5 +91,12 @@ p {
   border-color: var(--color-error);
 }
 
-@media (width <= 480px) { dialog { padding: 20px; } }
+@media (width <= 480px) {
+  dialog { padding: 20px; }
+
+  .dialog-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
 </style>

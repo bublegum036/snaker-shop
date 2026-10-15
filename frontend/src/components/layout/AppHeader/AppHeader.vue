@@ -71,22 +71,23 @@ nav {
   overflow-wrap: anywhere;
 }
 
-@media (width <= 600px) {
+@media (width <= 1000px) {
   .site-header {
-    min-height: 76px;
     justify-content: space-between;
     gap: 20px;
     flex-wrap: wrap;
     padding-block: 16px;
   }
 
-  .wordmark {
-    font-size: 34px;
-  }
-
   .header-account {
     width: 100%;
     justify-content: space-between;
+  }
+}
+
+@media (width <= 600px) {
+  .wordmark {
+    font-size: 34px;
   }
 }
 </style>

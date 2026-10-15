@@ -131,6 +131,7 @@ onBeforeUnmount(() => {
 
 .catalog-pagination label, .catalog-pagination > div {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
 }
@@ -142,6 +143,8 @@ nav {
 
 .catalog-intro {
   display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
   align-items: flex-end;
   justify-content: space-between;
   padding: 62px 0 52px;

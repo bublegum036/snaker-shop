@@ -97,11 +97,12 @@ function reset() {
 
 .filter-fields {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: minmax(0, 1.5fr) repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 
 .filter-fields label {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -130,6 +131,12 @@ function reset() {
 
   .search-field {
     grid-column: 1 / -1;
+  }
+}
+
+@media (width <= 480px) {
+  .filter-fields {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 </style>

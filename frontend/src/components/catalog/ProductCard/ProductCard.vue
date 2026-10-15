@@ -97,6 +97,7 @@ watch(() => props.product.image_url, () => { imageFailed.value = false })
 
 .product-heading {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
@@ -104,6 +105,8 @@ watch(() => props.product.image_url, () => { imageFailed.value = false })
 }
 
 h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
   margin: 0;
   font-size: 17px;
   font-weight: 600;
@@ -115,6 +118,7 @@ h3 {
 }
 
 .product-description {
+  overflow-wrap: anywhere;
   font-size: 12px;
   line-height: 1.5;
   color: var(--color-muted);

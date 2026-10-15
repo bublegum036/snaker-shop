@@ -23,14 +23,19 @@ defineProps<{ item: CartItem }>()
 <style scoped>
 .cart-line {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 24px;
   padding: 24px 0;
   border-bottom: 1px solid var(--color-border);
 }
 
+.cart-line > div {
+  min-width: 0;
+}
+
 h2 {
+  overflow-wrap: anywhere;
   margin: 0;
   font-size: 18px;
   font-weight: 600;
