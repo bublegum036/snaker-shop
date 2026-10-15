@@ -33,7 +33,7 @@ export default tseslint.config(
     rules: { 'no-console': ['error', { allow: ['warn', 'error'] }] },
   },
   {
-    files: ['*.{ts,mjs}', 'scripts/**/*.mjs'],
+    files: ['*.{ts,mjs}', 'scripts/**/*.mjs', 'e2e/**/*.ts'],
     languageOptions: { globals: globals.node },
   },
   {

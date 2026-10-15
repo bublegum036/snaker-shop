@@ -154,3 +154,22 @@ Keep personal order reads scoped to the owner even for administrators. Use
 separate admin order read routes with role checks in both HTTP and transaction.
 Status changes require confirmation, allow only the next transition, and must
 not alter stock, order item snapshots or saved checkout responses.
+
+
+## Browser E2E checks
+
+Frontend E2E lives in frontend/e2e/ with playwright.config.ts. Run
+`npm run test:e2e` from frontend after `nvm use`; Chromium must be installed
+with `npx playwright install chromium`. These agreed automated browser tests
+use real FastAPI/PostgreSQL, three Chromium viewports and generated accounts.
+Keep them separate from the DB-free `npm run check` command.
+
+Preserve the disposable database runner, nonce readiness check through /api,
+non-reused test servers (14200/18000) and cleanup on termination. Never point
+purchase tests at the working servers on 4200/8000 or reuse personal accounts.
+The runner must set DATABASE_URL before importing app modules and may delete
+only the database it successfully created. Keep trace/video/auth-state exports
+off and generated test results ignored; do not persist passwords or JWTs.
+Run E2E for changes to its runner/config/specs or browser interaction flows.
+Viewport assertions do not establish real-device coverage or native select
+popup positioning; state those limitations explicitly when reporting results.

@@ -28,7 +28,9 @@
     "check:notifications": "node scripts/check-notifications.mjs",
     "check:admin-inventory": "node scripts/check-admin-inventory.mjs",
     "check:admin-orders": "node scripts/check-admin-orders.mjs",
-    "check:router": "node scripts/check-router.mjs"
+    "check:router": "node scripts/check-router.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "pinia": "^3.0.3",
@@ -37,6 +39,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@tsconfig/node22": "^22.0.2",
     "@types/node": "^22.16.5",
