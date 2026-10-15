@@ -173,3 +173,20 @@ off and generated test results ignored; do not persist passwords or JWTs.
 Run E2E for changes to its runner/config/specs or browser interaction flows.
 Viewport assertions do not establish real-device coverage or native select
 popup positioning; state those limitations explicitly when reporting results.
+
+
+## Shared local development
+
+Run `make dev`, `make status`, `make stop` from the workspace root on macOS/Linux.
+Make wraps scripts/dev.py (stdlib Python supervisor) and check_local_backend.py
+(backend venv, read-only configuration/database revision check).
+Use `make check-launcher` for supervisor changes; verify lifecycle with separate
+ports (`make dev API_PORT=18001 WEB_PORT=14201`) while preserving working servers.
+`make check` selects compatible Node and runs the frontend lint/build/scenarios.
+
+Preserve private Unix control socket/flock, child process group ownership,
+occupied-port refusal, readiness through the frontend proxy and synchronous stop.
+Never kill processes by port/name or adopt pre-existing servers. Keep .local/
+untracked. PostgreSQL remains running after stop; never remove its volume.
+Normal dev startup does not migrate/seed or overwrite environment files.
+`make migrate` and `make seed` are explicit separate actions, not startup hooks.
