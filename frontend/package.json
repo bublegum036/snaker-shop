@@ -17,7 +17,8 @@
     "check:checkout": "node scripts/check-checkout.mjs",
     "check:orders": "node scripts/check-orders.mjs",
     "check:admin-products": "node scripts/check-admin-products.mjs",
-    "check:notifications": "node scripts/check-notifications.mjs"
+    "check:notifications": "node scripts/check-notifications.mjs",
+    "check:admin-inventory": "node scripts/check-admin-inventory.mjs"
   },
   "dependencies": {
     "pinia": "^3.0.3",

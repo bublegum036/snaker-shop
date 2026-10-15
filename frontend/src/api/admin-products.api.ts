@@ -24,3 +24,7 @@ export function updateProduct(request: AuthorizedRequest, id: number, body: Prod
 export function deleteProduct(request: AuthorizedRequest, id: number, signal?: AbortSignal): Promise<void> {
   return request(`/products/${id}`, { method: 'DELETE', signal })
 }
+
+export function getAdminProduct(request: AuthorizedRequest, id: number, signal?: AbortSignal): Promise<Product> {
+  return request(`/products/${id}`, { signal })
+}

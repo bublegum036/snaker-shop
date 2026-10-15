@@ -1,6 +1,6 @@
 import { onScopeDispose, ref, watch } from 'vue'
 import { getOrder, type Order } from '@/api/orders.api'
-import { isOrderId } from '@/utils/order-id'
+import { isPositiveId } from '@/utils/positive-id'
 import { ApiError } from '@/api/http.client'
 import { useAuthStore } from '@/stores/auth/auth.store'
 import { orderDetailsTexts as text } from './useOrderDetails.texts'
@@ -20,7 +20,7 @@ export function useOrderDetails(orderId: () => string) {
     error.value = ''
     if (disposed || !auth.isAuthenticated) return
     const id = orderId()
-    if (!isOrderId(id)) { error.value = text.invalidId; return }
+    if (!isPositiveId(id)) { error.value = text.invalidId; return }
     const current = new AbortController()
     request = current
     loading.value = true

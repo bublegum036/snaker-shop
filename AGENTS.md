@@ -96,7 +96,8 @@ Node.js (the working local version is 22.12). For authentication changes,
 also run `npm run check:auth`; these isolated checks do not touch real accounts.
 For cart changes, also run `npm run check:cart`; for checkout changes run
 `npm run check:checkout` too; for order-history changes run `npm run check:orders`.
-For admin-product changes run `npm run check:admin-products`; preserve role guards,
+For admin-product changes run `npm run check:admin-products`; for inventory
+changes run `npm run check:admin-inventory`. Preserve role guards,
 confirmation before deletion and explicit reconciliation after uncertain writes.
 Use the shared ConfirmDialog for confirmations without changing page flow.
 Admin successes use the shared notifications store/host and expire after 3000ms.
@@ -135,3 +136,7 @@ prices or inventory. Keep the working database volume; ordinary shutdown uses
 Keep Russian teaching documentation consistent with the implemented API and
 milestone scope. Update relevant run instructions when behavior changes.
 Do not regenerate PDFs, reports, or the archive manifest for unrelated edits.
+
+For inventory writes, reuse ProductSize fields, allow stock 0, and send only
+changed PATCH fields. Editing size alone must not resubmit a stale stock value.
+Preserve server restrictions on referenced variant rename/deletion.
