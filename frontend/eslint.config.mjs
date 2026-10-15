@@ -5,7 +5,7 @@ import globals from 'globals'
 import stylistic from '@stylistic/eslint-plugin'
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'dist-ssr/**', 'coverage/**', 'node_modules/**'] },
+  { ignores: ['dist/**', 'dist-ssr/**', 'coverage/**', 'node_modules/**', 'test-results/**', 'playwright-report/**', 'playwright/.auth/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...vue.configs['flat/essential'],

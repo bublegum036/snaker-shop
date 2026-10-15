@@ -6,6 +6,7 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
+    "playwright.preview.config.ts",
     "eslint.config.*",
     "e2e/**/*.ts"
   ],

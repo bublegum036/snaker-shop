@@ -81,6 +81,8 @@ test('registration, cart confirmations, checkout and purchase history', async ({
   await expect(page.getByRole('heading', { name: /Заказ №\d+ оформлен/ })).toBeVisible()
   await expect(page.getByText('Корзина пока пуста. Выберите свою пару в каталоге.', { exact: true })).toBeVisible()
   await page.getByRole('link', { name: 'Посмотреть заказ →', exact: true }).click()
+  await expect(page).toHaveURL(/\/orders\/\d+$/)
+  await page.reload()
   await expect(page.getByRole('heading', { name: 'North Runner', exact: true })).toBeVisible()
   await expect(page.getByText(/^7\s990\s₽$/).first()).toBeVisible()
   await page.goto('/orders')

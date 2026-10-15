@@ -30,7 +30,9 @@
     "check:admin-orders": "node scripts/check-admin-orders.mjs",
     "check:router": "node scripts/check-router.mjs",
     "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:preview": "playwright test --config playwright.preview.config.ts",
+    "check:preview": "run-s build test:e2e:preview"
   },
   "dependencies": {
     "pinia": "^3.0.3",

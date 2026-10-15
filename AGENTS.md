@@ -190,3 +190,21 @@ Never kill processes by port/name or adopt pre-existing servers. Keep .local/
 untracked. PostgreSQL remains running after stop; never remove its volume.
 Normal dev startup does not migrate/seed or overwrite environment files.
 `make migrate` and `make seed` are explicit separate actions, not startup hooks.
+
+
+## Built frontend preview checks
+
+`npm run check:preview` from frontend builds dist and runs 12 isolated
+Playwright checks against Vite preview. `npm run test:e2e:preview` alone uses
+an existing dist; prefer check:preview to avoid stale builds. Regular dev E2E
+excludes *.preview.spec.ts and still runs 9 scenarios. Run both for shared
+proxy/E2E changes. Preserve one backend/frontend pair when deriving the preview
+config; multi-argument defineConfig concatenates webServer arrays.
+
+Local preview defaults to 127.0.0.1:4300 with strictPort and the same API proxy
+as dev. E2E still uses isolated 14200/18000 and a disposable database. Never
+use working accounts/data for these purchase tests. Confirm cleanup after runs.
+Ignore generated test-results/playwright-report/auth exports in ESLint as well
+as Git: test runners can remove/recreate those directories while lint runs.
+Preview verifies built files locally, not production hosting, TLS or real-device
+native picker behavior. Keep actual deployment work local unless authorized.
